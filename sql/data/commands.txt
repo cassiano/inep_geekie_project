@@ -1,0 +1,14 @@
+awk 'substr($0,212,7)=="3550308" {print}' DADOS_ENEM_2011.TXT >enem_cidade_sao_paulo.txt 
+wc -l enem_cidade_sao_paulo.txt 
+
+awk 'substr($0,4,7)=="3550308" {print}' sudeste.csv >escolas_cidade_sao_paulo.csv 
+wc -l escolas_cidade_sao_paulo.csv
+
+awk 'substr($0,369,2)=="SP" {print}' DADOS_ENEM_2011.TXT >enem_estado_sao_paulo.txt 
+wc -l enem_estado_sao_paulo.txt 
+
+awk 'substr($0,1,2)=="SP" {print}' sudeste.csv >escolas_estado_sao_paulo.csv 
+wc -l escolas_estado_sao_paulo.csv
+
+~/pgloader/pgloader.PY -vsc schools_pgloader.conf
+~/pgloader/pgloader.PY -vsc enem_pgloader.conf
