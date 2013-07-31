@@ -20,9 +20,12 @@ create table raw_enem_scores(
   year int,
   age int,
   gender int,
-  school_id char(8), -- here we should not stablish a FK constraint, so invalid rows are properly loaded!
+  school_id char(8),  -- here we should not stablish a FK constraint, so 
+                      -- invalid rows are properly loaded!
 
-  -- the next 3 columns will also be loaded, breaking normalization rules, in order to calculate all states aggregations even if somes schools are missing!
+  -- the next 3 columns will also be loaded, breaking normalization rules, 
+  -- which will allow the calculation of all state aggregations even if somes 
+  -- schools are missing!
   state char(2),
   city_id char(7),
   city varchar(255),
@@ -53,7 +56,8 @@ create table aggregated_scores_by_school(
   score_range int not null,
   student_count int not null
 );
-alter table aggregated_scores_by_school add primary key (school_id, year, enem_subject_id, score_range);
+alter table aggregated_scores_by_school 
+  add primary key (school_id, year, enem_subject_id, score_range);
 
 -- aggregated_scores_by_states table.
 create table aggregated_scores_by_state(
@@ -63,7 +67,8 @@ create table aggregated_scores_by_state(
   score_range int not null,
   student_count int not null
 );
-alter table aggregated_scores_by_state add primary key (state, year, enem_subject_id, score_range);
+alter table aggregated_scores_by_state 
+  add primary key (state, year, enem_subject_id, score_range);
 
 -- aggregated_scores_by_states table.
 create table aggregated_scores_by_city(
@@ -74,4 +79,5 @@ create table aggregated_scores_by_city(
   score_range int not null,
   student_count int not null
 );
-alter table aggregated_scores_by_city add primary key (city_id, year, enem_subject_id, score_range);
+alter table aggregated_scores_by_city 
+  add primary key (city_id, year, enem_subject_id, score_range);
