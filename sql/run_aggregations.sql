@@ -6,13 +6,9 @@
 insert into 
   aggregated_scores_by_school
 select 
-  s.id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r 
-inner join 
-  schools s on s.id = r.school_id 
-inner join 
-  enem_subjects es on es.name = 'ciencias da natureza'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias da natureza'
 where 
   r.year = 2011 and r.nature_sciences_score is not null 
 group by 
@@ -24,17 +20,13 @@ order by
 insert into 
   aggregated_scores_by_school
 select 
-  s.id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r 
-inner join 
-  schools s on s.id = r.school_id 
-inner join 
-  enem_subjects es on es.name = 'ciencias humanas'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias humanas'
 where 
   r.year = 2011 and r.nature_sciences_score is not null 
 group by 
-  s.id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
+  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
 order by 
   4;
 
@@ -42,17 +34,13 @@ order by
 insert into 
   aggregated_scores_by_school
 select 
-  s.id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r 
-inner join 
-  schools s on s.id = r.school_id
-inner join 
-  enem_subjects es on es.name = 'linguagens e codigos'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'linguagens e codigos'
 where 
   r.year = 2011 and r.nature_sciences_score is not null 
 group by 
-  s.id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
+  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
 order by 
   4;
   
@@ -60,17 +48,13 @@ order by
 insert into 
   aggregated_scores_by_school
 select 
-  s.id, r.year, es.id, trunc((cast(r.math_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.school_id, r.year, es.id, trunc((cast(r.math_score as float) - 0.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r 
-inner join 
-  schools s on s.id = r.school_id
-inner join 
-  enem_subjects es on es.name = 'matematica'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'matematica'
 where 
   r.year = 2011 and r.math_score is not null 
 group by 
-  s.id, r.year, es.id, trunc((cast(r.math_score as float) - 0.0000000001) / 100 + 1)
+  r.school_id, r.year, es.id, trunc((cast(r.math_score as float) - 0.0000000001) / 100 + 1)
 order by 
   4;
 
