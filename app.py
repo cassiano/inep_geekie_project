@@ -29,7 +29,7 @@ class School(db.Model):
         return '<School %s [%s-%s]>' % (self.name, self.city, self.state)
 
     def aggregated_scores_by_year_and_enem_subject_id(self, year, enem_subject_id):
-        return self.aggregated_scores.filter_by(year=year, enem_subject_id=enem_subject_id.lower())
+        return self.aggregated_scores.filter_by(year=year, enem_subject_id=enem_subject_id.upper())
         
     @classmethod
     def search(cls, city_id, term):

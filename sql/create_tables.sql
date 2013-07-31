@@ -40,10 +40,10 @@ create table enem_subjects(
   name varchar(255) not null
 );
 insert into enem_subjects (id, name) values 
-  ('nat', 'ciencias da natureza'),
-  ('hum', 'ciencias humanas'),
-  ('lin', 'linguagens e codigos'),
-  ('mat', 'matematica');
+  ('NAT', 'ciencias da natureza'),
+  ('HUM', 'ciencias humanas'),
+  ('LIN', 'linguagens e codigos'),
+  ('MAT', 'matematica');
 
 -- aggregated_scores_by_schools table.
 create table aggregated_scores_by_school(
