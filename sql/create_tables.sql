@@ -36,6 +36,9 @@ create table raw_enem_scores(
   math_score varchar(9)
 );
 create index school_id on raw_enem_scores (school_id);
+create index city_id on raw_enem_scores (city_id);
+create index state on raw_enem_scores (state);
+create index year on raw_enem_scores (year);
 
 -- enem_subjects table.
 create table enem_subjects(
