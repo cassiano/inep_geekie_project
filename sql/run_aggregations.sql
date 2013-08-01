@@ -2,17 +2,19 @@
 -- schools
 -----------
 
+truncate table aggregated_scores_by_school;
+
 -- ciencias da natureza
 insert into 
   aggregated_scores_by_school
 select 
-  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) / 1.0000000001) / 100 + 1), count(*)
 from 
   raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias da natureza'
 where 
   r.year = 2011 and r.nature_sciences_score is not null 
 group by 
-  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
+  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
 
@@ -20,13 +22,13 @@ order by
 insert into 
   aggregated_scores_by_school
 select 
-  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.school_id, r.year, es.id, trunc((cast(r.human_sciences_score as float) / 1.0000000001) / 100 + 1), count(*)
 from 
   raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias humanas'
 where 
-  r.year = 2011 and r.nature_sciences_score is not null 
+  r.year = 2011 and r.human_sciences_score is not null 
 group by 
-  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
+  r.school_id, r.year, es.id, trunc((cast(r.human_sciences_score as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
 
@@ -34,13 +36,13 @@ order by
 insert into 
   aggregated_scores_by_school
 select 
-  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.school_id, r.year, es.id, trunc((cast(r.languages_and_codes_score as float) / 1.0000000001) / 100 + 1), count(*)
 from 
   raw_enem_scores r inner join enem_subjects es on es.name = 'linguagens e codigos'
 where 
-  r.year = 2011 and r.nature_sciences_score is not null 
+  r.year = 2011 and r.languages_and_codes_score is not null 
 group by 
-  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
+  r.school_id, r.year, es.id, trunc((cast(r.languages_and_codes_score as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
   
@@ -48,13 +50,13 @@ order by
 insert into 
   aggregated_scores_by_school
 select 
-  r.school_id, r.year, es.id, trunc((cast(r.math_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.school_id, r.year, es.id, trunc((cast(r.math_score as float) / 1.0000000001) / 100 + 1), count(*)
 from 
   raw_enem_scores r inner join enem_subjects es on es.name = 'matematica'
 where 
   r.year = 2011 and r.math_score is not null 
 group by 
-  r.school_id, r.year, es.id, trunc((cast(r.math_score as float) - 0.0000000001) / 100 + 1)
+  r.school_id, r.year, es.id, trunc((cast(r.math_score as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
 
@@ -62,17 +64,19 @@ order by
 -- states
 -----------
 
+truncate table aggregated_scores_by_state;
+
 -- ciencias da natureza
 insert into 
   aggregated_scores_by_state
 select 
-  r.state, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.state, r.year, es.id, trunc((cast(r.nature_sciences_score as float) / 1.0000000001) / 100 + 1), count(*)
 from 
   raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias da natureza'
 where 
   r.year = 2011 and r.nature_sciences_score is not null 
 group by 
-  r.state, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
+  r.state, r.year, es.id, trunc((cast(r.nature_sciences_score as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
 
@@ -80,13 +84,13 @@ order by
 insert into 
   aggregated_scores_by_state
 select 
-  r.state, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.state, r.year, es.id, trunc((cast(r.human_sciences_score as float) / 1.0000000001) / 100 + 1), count(*)
 from 
   raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias humanas'
 where 
-  r.year = 2011 and r.nature_sciences_score is not null 
+  r.year = 2011 and r.human_sciences_score is not null 
 group by 
-  r.state, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
+  r.state, r.year, es.id, trunc((cast(r.human_sciences_score as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
 
@@ -94,13 +98,13 @@ order by
 insert into 
   aggregated_scores_by_state
 select 
-  r.state, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.state, r.year, es.id, trunc((cast(r.languages_and_codes_score as float) / 1.0000000001) / 100 + 1), count(*)
 from 
   raw_enem_scores r inner join enem_subjects es on es.name = 'linguagens e codigos'
 where 
-  r.year = 2011 and r.nature_sciences_score is not null 
+  r.year = 2011 and r.languages_and_codes_score is not null 
 group by 
-  r.state, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
+  r.state, r.year, es.id, trunc((cast(r.languages_and_codes_score as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
   
@@ -108,13 +112,13 @@ order by
 insert into 
   aggregated_scores_by_state
 select 
-  r.state, r.year, es.id, trunc((cast(r.math_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.state, r.year, es.id, trunc((cast(r.math_score as float) / 1.0000000001) / 100 + 1), count(*)
 from 
   raw_enem_scores r inner join enem_subjects es on es.name = 'matematica'
 where 
   r.year = 2011 and r.math_score is not null 
 group by 
-  r.state, r.year, es.id, trunc((cast(r.math_score as float) - 0.0000000001) / 100 + 1)
+  r.state, r.year, es.id, trunc((cast(r.math_score as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
 
@@ -122,17 +126,19 @@ order by
 -- cities
 -----------
 
+truncate table aggregated_scores_by_city;
+
 -- ciencias da natureza
 insert into 
   aggregated_scores_by_city
 select 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.city_id, r.city, r.year, es.id, trunc((cast(r.nature_sciences_score as float) / 1.0000000001) / 100 + 1), count(*)
 from 
   raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias da natureza'
 where 
   r.year = 2011 and r.nature_sciences_score is not null 
 group by 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
+  r.city_id, r.city, r.year, es.id, trunc((cast(r.nature_sciences_score as float) / 1.0000000001) / 100 + 1)
 order by 
   5;
 
@@ -140,13 +146,13 @@ order by
 insert into 
   aggregated_scores_by_city
 select 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.city_id, r.city, r.year, es.id, trunc((cast(r.human_sciences_score as float) / 1.0000000001) / 100 + 1), count(*)
 from 
   raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias humanas'
 where 
-  r.year = 2011 and r.nature_sciences_score is not null 
+  r.year = 2011 and r.human_sciences_score is not null 
 group by 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
+  r.city_id, r.city, r.year, es.id, trunc((cast(r.human_sciences_score as float) / 1.0000000001) / 100 + 1)
 order by 
   5;
 
@@ -154,13 +160,13 @@ order by
 insert into 
   aggregated_scores_by_city
 select 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.city_id, r.city, r.year, es.id, trunc((cast(r.languages_and_codes_score as float) / 1.0000000001) / 100 + 1), count(*)
 from 
   raw_enem_scores r inner join enem_subjects es on es.name = 'linguagens e codigos'
 where 
-  r.year = 2011 and r.nature_sciences_score is not null 
+  r.year = 2011 and r.languages_and_codes_score is not null 
 group by 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
+  r.city_id, r.city, r.year, es.id, trunc((cast(r.languages_and_codes_score as float) / 1.0000000001) / 100 + 1)
 order by 
   5;
   
@@ -168,12 +174,12 @@ order by
 insert into 
   aggregated_scores_by_city
 select 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.math_score as float) - 0.0000000001) / 100 + 1), count(*)
+  r.city_id, r.city, r.year, es.id, trunc((cast(r.math_score as float) / 1.0000000001) / 100 + 1), count(*)
 from 
   raw_enem_scores r inner join enem_subjects es on es.name = 'matematica'
 where 
   r.year = 2011 and r.math_score is not null 
 group by 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.math_score as float) - 0.0000000001) / 100 + 1)
+  r.city_id, r.city, r.year, es.id, trunc((cast(r.math_score as float) / 1.0000000001) / 100 + 1)
 order by 
   5;
