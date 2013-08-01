@@ -2,11 +2,12 @@
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash, json, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
+from os import environ
 
 # Configuration.
 DEBUG                   = True
 SECRET_KEY              = 'development key'
-SQLALCHEMY_DATABASE_URI = 'postgres://cassiano:@localhost:5432/inep'
+SQLALCHEMY_DATABASE_URI = environ.get('HEROKU_POSTGRESQL_OLIVE_URL') or 'postgres://cassiano:@localhost:5432/inep'
 
 # Create the application.
 app = Flask(__name__)
