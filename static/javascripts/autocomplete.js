@@ -10,26 +10,15 @@ $(function() {
         return;
       }
 
-      $.getJSON('/schools/search/' + $('#city_id').val() + '.json', request, function(data, status, xhr) {
+      $.getJSON('/schools/search/' + window.viewModel.cityId() + '.json', request, function(data, status, xhr) {
         cache[term] = data.schools;
         response(cache[term]);
       });
     },
     select: function(event, ui) {
-      var schoolId = ui.item.id;
-
-      // Save the selected school id and name in the DOM.
-      $('#school_id').val(schoolId);
-      $('#school_name').val(ui.item.value);
-
-      // Get the selected school data series.
-      var enemSubject = $('#enem_subject').val();
-      var year         = $('#year').val();
-      var api          = '/schools/' + schoolId +'/aggregated_scores/' + year + '/' + enemSubject + '.json';
-
-      $.getJSON(api, function(data) {
-        window.updateChartData(data);
-      });
+      // Update the view model with the selected school id and name.
+      window.viewModel.schoolId(ui.item.id);
+      window.viewModel.schoolName(ui.item.value);
     }
   })
 });
