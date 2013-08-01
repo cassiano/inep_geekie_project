@@ -1,3 +1,5 @@
 *.pyc
 .DS_Store
 env/*
+sql/data/enem_cidade_sao_paulo.txt
+sql/data/enem_estado_sao_paulo.txt
