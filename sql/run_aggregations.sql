@@ -12,7 +12,7 @@ from
 where 
   r.year = 2011 and r.nature_sciences_score is not null 
 group by 
-  s.id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
+  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) - 0.0000000001) / 100 + 1)
 order by 
   4;
 

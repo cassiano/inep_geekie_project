@@ -35,10 +35,10 @@ create table raw_enem_scores(
   languages_and_codes_score varchar(9),
   math_score varchar(9)
 );
-create index school_id on raw_enem_scores (school_id);
-create index city_id on raw_enem_scores (city_id);
-create index state on raw_enem_scores (state);
-create index year on raw_enem_scores (year);
+create index school_id on raw_enem_scores(school_id);
+create index city_id on raw_enem_scores(city_id);
+create index state on raw_enem_scores(state);
+create index year on raw_enem_scores(year);
 
 -- enem_subjects table.
 create table enem_subjects(
@@ -53,7 +53,7 @@ insert into enem_subjects (id, name) values
 
 -- aggregated_scores_by_schools table.
 create table aggregated_scores_by_school(
-  school_id char(8) not null references schools(id),
+  school_id char(8) not null,
   year int not null,
   enem_subject_id char(3) not null references enem_subjects(id),
   score_range int not null,
