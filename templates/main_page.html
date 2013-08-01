@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block scripts %}
+	<script type="text/javascript" src='http://code.jquery.com/ui/1.10.3/jquery-ui.js'></script>
+	<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
+	<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/globalize/0.1.1/globalize.min.js"></script>
+	<script type="text/javascript" src="http://cdn3.devexpress.com/jslib/13.1.5/js/dx.chartjs.js"></script>
+
+	<script type="text/javascript" src='{{ url_for('static', filename='javascripts/autocomplete.js') }}'></script>
+	<script type="text/javascript" src='{{ url_for('static', filename='javascripts/chart.js') }}'></script>
+{% endblock %}
+
+{% block body %}
+	<h1>Comparador de performance de escolas no Enem</h1>
+	
+	<br />
+	<div class="ui-widget">
+		<input type="hidden" id="year" value="2011" />
+		<input type="hidden" id="enem_subject" value="nat" />
+		<input type="hidden" id="city_id" value="3550308" />		<!-- 3550308 = São Paulo -->
+		
+	  <label for="school">Escola: </label>
+	  <input id="school" size="50" placeholder="Selecione uma escola" />
+	  <input type="hidden" id="school_id" />
+	  <input type="hidden" id="school_name" />
+	</div>
+
+	<br />
+	<div id="chartContainer" style="max-width: 800px; height: 400px; display: none;"></div>
+{% endblock %}
