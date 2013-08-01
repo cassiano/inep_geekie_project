@@ -22,15 +22,13 @@ $(function() {
       $('#school_id').val(schoolId);
       $('#school_name').val(ui.item.value);
 
+      // Get the selected school data series.
       var enemSubject = $('#enem_subject').val();
       var year         = $('#year').val();
       var api          = '/schools/' + schoolId +'/aggregated_scores/' + year + '/' + enemSubject + '.json';
 
-      // Get the selected school data series.
       $.getJSON(api, function(data) {
-        // Display the new chart.
-        $('#chartContainer').show();
-        buildBarchart(data);
+        window.updateChartData(data);
       });
     }
   })
