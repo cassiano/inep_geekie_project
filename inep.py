@@ -6,7 +6,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 # Configuration.
 DEBUG                   = True
 SECRET_KEY              = 'development key'
-SQLALCHEMY_DATABASE_URI = 'postgres://cassiano:@localhost:5432/pgloader'
+SQLALCHEMY_DATABASE_URI = 'postgres://cassiano:@localhost:5432/inep'
 
 # Create the application.
 app = Flask(__name__)
@@ -156,7 +156,3 @@ def school_search(city_id):
 @app.route('/')
 def show_main_page():
     return render_template('main_page.html')
-
-if __name__ == "__main__":
-    # Start the application.
-    app.run()
