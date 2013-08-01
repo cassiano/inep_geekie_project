@@ -1,6 +1,10 @@
+# Starting Postgres:
 pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start
 
+# Filtering records:
 awk 'substr($0,212,7)=="3550308" {print}' DADOS_ENEM_2011.TXT >enem_cidade_sao_paulo.txt 
+
+# Counting lines:
 wc -l enem_cidade_sao_paulo.txt 
 
 awk 'substr($0,4,7)=="3550308" {print}' sudeste.csv >escolas_cidade_sao_paulo.csv 
@@ -12,5 +16,25 @@ wc -l enem_estado_sao_paulo.txt
 awk 'substr($0,1,2)=="SP" {print}' sudeste.csv >escolas_estado_sao_paulo.csv 
 wc -l escolas_estado_sao_paulo.csv
 
+# Running pgloader:
 ~/pgloader/pgloader.PY -vsc schools_pgloader.conf
 ~/pgloader/pgloader.PY -vsc enem_pgloader.conf
+
+# Start the HTTP server:
+foreman start
+
+# Some Heroku commands (https://devcenter.heroku.com/articles/python):
+heroku create
+git push heroku master
+heroku open
+heroku addons:add heroku-postgresql:dev
+heroku addons | grep POSTGRES
+heroku pg:wait 
+heroku config | grep HEROKU_POSTGRESQL
+heroku run python
+heroku login
+heroku ps:scale web=1
+heroku ps
+heroku logs
+heroku pgbackups:restore HEROKU_POSTGRESQL_OLIVE_URL 'https://www.dropbox.com/s/ekh1xpantoh9rpb/inep.dump'
+heroku addons:add pgbackups
