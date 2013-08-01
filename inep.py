@@ -34,7 +34,7 @@ class School(db.Model):
         return '<School %s [%s-%s]>' % (self.name, self.city, self.state)
 
     def aggregated_scores_by_year_and_enem_subject_id(self, year, enem_subject_id):
-        return self.aggregated_scores.filter_by(year=year, enem_subject_id=enem_subject_id.lower())
+        return self.aggregated_scores.filter_by(year=year, enem_subject_id=enem_subject_id.upper())
         
     @classmethod
     def search(cls, city_id, term):
@@ -75,7 +75,7 @@ class AggregatedScoreByState(db.Model):
         
     @classmethod
     def aggregated_scores_by_state_and_year_and_enem_subject_id(cls, state, year, enem_subject_id):
-        return cls.query.filter_by(state=state.upper(), year=year, enem_subject_id=enem_subject_id.lower())
+        return cls.query.filter_by(state=state.upper(), year=year, enem_subject_id=enem_subject_id.upper())
 
 class AggregatedScoreByCity(db.Model):
     __tablename__ = 'aggregated_scores_by_city'
@@ -96,7 +96,7 @@ class AggregatedScoreByCity(db.Model):
         
     @classmethod
     def aggregated_scores_by_city_id_and_year_and_enem_subject_id(cls, city_id, year, enem_subject_id):
-        return cls.query.filter_by(city_id=city_id, year=year, enem_subject_id=enem_subject_id.lower())
+        return cls.query.filter_by(city_id=city_id, year=year, enem_subject_id=enem_subject_id.upper())
 
 class EnemSubject(db.Model):
     __tablename__ = 'enem_subjects'
