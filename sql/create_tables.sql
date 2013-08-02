@@ -30,6 +30,10 @@ create table raw_enem_scores(
   city_id char(7),
   city varchar(255),
 
+  present_in_nature_sciences_exam smallint,
+  present_in_human_sciences_exam smallint,
+  present_in_languages_and_codes_exam smallint,
+  present_in_math_exam smallint,
   nature_sciences_score varchar(9),
   human_sciences_score varchar(9),
   languages_and_codes_score varchar(9),
@@ -46,10 +50,10 @@ create table enem_subjects(
   name varchar(255) not null
 );
 insert into enem_subjects (id, name) values 
-  ('NAT', 'ciencias da natureza'),
-  ('HUM', 'ciencias humanas'),
-  ('LIN', 'linguagens e codigos'),
-  ('MAT', 'matematica');
+  ('NAT', 'Ciências da Natureza'),
+  ('HUM', 'Ciências Humanas'),
+  ('LIN', 'Linguagens e Códigos'),
+  ('MAT', 'Matemática');
 
 -- aggregated_scores_by_schools table.
 create table aggregated_scores_by_school(

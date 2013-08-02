@@ -4,59 +4,59 @@
 
 truncate table aggregated_scores_by_school;
 
--- ciencias da natureza
+-- Ciências da Natureza
 insert into 
   aggregated_scores_by_school
 select 
-  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) / 1.0000000001) / 100 + 1), count(*)
+  r.school_id, r.year, es.id, trunc((cast(trim(both ' ' from r.nature_sciences_score) as float) / 1.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias da natureza'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'Ciências da Natureza'
 where 
-  r.year = 2011 and r.nature_sciences_score is not null 
+  r.year = 2011 and r.present_in_nature_sciences_exam = 1
 group by 
-  r.school_id, r.year, es.id, trunc((cast(r.nature_sciences_score as float) / 1.0000000001) / 100 + 1)
+  r.school_id, r.year, es.id, trunc((cast(trim(both ' ' from r.nature_sciences_score) as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
 
--- ciencias humanas
+-- Ciências Humanas
 insert into 
   aggregated_scores_by_school
 select 
-  r.school_id, r.year, es.id, trunc((cast(r.human_sciences_score as float) / 1.0000000001) / 100 + 1), count(*)
+  r.school_id, r.year, es.id, trunc((cast(trim(both ' ' from r.human_sciences_score) as float) / 1.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias humanas'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'Ciências Humanas'
 where 
-  r.year = 2011 and r.human_sciences_score is not null 
+  r.year = 2011 and r.present_in_human_sciences_exam = 1
 group by 
-  r.school_id, r.year, es.id, trunc((cast(r.human_sciences_score as float) / 1.0000000001) / 100 + 1)
+  r.school_id, r.year, es.id, trunc((cast(trim(both ' ' from r.human_sciences_score) as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
 
--- linguagens e codigos
+-- Linguagens e Códigos
 insert into 
   aggregated_scores_by_school
 select 
-  r.school_id, r.year, es.id, trunc((cast(r.languages_and_codes_score as float) / 1.0000000001) / 100 + 1), count(*)
+  r.school_id, r.year, es.id, trunc((cast(trim(both ' ' from r.languages_and_codes_score) as float) / 1.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r inner join enem_subjects es on es.name = 'linguagens e codigos'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'Linguagens e Códigos'
 where 
-  r.year = 2011 and r.languages_and_codes_score is not null 
+  r.year = 2011 and r.present_in_languages_and_codes_exam = 1
 group by 
-  r.school_id, r.year, es.id, trunc((cast(r.languages_and_codes_score as float) / 1.0000000001) / 100 + 1)
+  r.school_id, r.year, es.id, trunc((cast(trim(both ' ' from r.languages_and_codes_score) as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
   
--- matematica
+-- Matemática
 insert into 
   aggregated_scores_by_school
 select 
-  r.school_id, r.year, es.id, trunc((cast(r.math_score as float) / 1.0000000001) / 100 + 1), count(*)
+  r.school_id, r.year, es.id, trunc((cast(trim(both ' ' from r.math_score) as float) / 1.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r inner join enem_subjects es on es.name = 'matematica'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'Matemática'
 where 
-  r.year = 2011 and r.math_score is not null 
+  r.year = 2011 and r.present_in_math_exam = 1
 group by 
-  r.school_id, r.year, es.id, trunc((cast(r.math_score as float) / 1.0000000001) / 100 + 1)
+  r.school_id, r.year, es.id, trunc((cast(trim(both ' ' from r.math_score) as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
 
@@ -66,59 +66,59 @@ order by
 
 truncate table aggregated_scores_by_state;
 
--- ciencias da natureza
+-- Ciências da Natureza
 insert into 
   aggregated_scores_by_state
 select 
-  r.state, r.year, es.id, trunc((cast(r.nature_sciences_score as float) / 1.0000000001) / 100 + 1), count(*)
+  r.state, r.year, es.id, trunc((cast(trim(both ' ' from r.nature_sciences_score) as float) / 1.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias da natureza'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'Ciências da Natureza'
 where 
-  r.year = 2011 and r.nature_sciences_score is not null 
+  r.year = 2011 and r.present_in_nature_sciences_exam = 1
 group by 
-  r.state, r.year, es.id, trunc((cast(r.nature_sciences_score as float) / 1.0000000001) / 100 + 1)
+  r.state, r.year, es.id, trunc((cast(trim(both ' ' from r.nature_sciences_score) as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
 
--- ciencias humanas
+-- Ciências Humanas
 insert into 
   aggregated_scores_by_state
 select 
-  r.state, r.year, es.id, trunc((cast(r.human_sciences_score as float) / 1.0000000001) / 100 + 1), count(*)
+  r.state, r.year, es.id, trunc((cast(trim(both ' ' from r.human_sciences_score) as float) / 1.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias humanas'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'Ciências Humanas'
 where 
-  r.year = 2011 and r.human_sciences_score is not null 
+  r.year = 2011 and r.present_in_human_sciences_exam = 1
 group by 
-  r.state, r.year, es.id, trunc((cast(r.human_sciences_score as float) / 1.0000000001) / 100 + 1)
+  r.state, r.year, es.id, trunc((cast(trim(both ' ' from r.human_sciences_score) as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
 
--- linguagens e codigos
+-- Linguagens e Códigos
 insert into 
   aggregated_scores_by_state
 select 
-  r.state, r.year, es.id, trunc((cast(r.languages_and_codes_score as float) / 1.0000000001) / 100 + 1), count(*)
+  r.state, r.year, es.id, trunc((cast(trim(both ' ' from r.languages_and_codes_score) as float) / 1.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r inner join enem_subjects es on es.name = 'linguagens e codigos'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'Linguagens e Códigos'
 where 
-  r.year = 2011 and r.languages_and_codes_score is not null 
+  r.year = 2011 and r.present_in_languages_and_codes_exam = 1
 group by 
-  r.state, r.year, es.id, trunc((cast(r.languages_and_codes_score as float) / 1.0000000001) / 100 + 1)
+  r.state, r.year, es.id, trunc((cast(trim(both ' ' from r.languages_and_codes_score) as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
   
--- matematica
+-- Matemática
 insert into 
   aggregated_scores_by_state
 select 
-  r.state, r.year, es.id, trunc((cast(r.math_score as float) / 1.0000000001) / 100 + 1), count(*)
+  r.state, r.year, es.id, trunc((cast(trim(both ' ' from r.math_score) as float) / 1.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r inner join enem_subjects es on es.name = 'matematica'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'Matemática'
 where 
-  r.year = 2011 and r.math_score is not null 
+  r.year = 2011 and r.present_in_math_exam = 1
 group by 
-  r.state, r.year, es.id, trunc((cast(r.math_score as float) / 1.0000000001) / 100 + 1)
+  r.state, r.year, es.id, trunc((cast(trim(both ' ' from r.math_score) as float) / 1.0000000001) / 100 + 1)
 order by 
   4;
 
@@ -128,58 +128,58 @@ order by
 
 truncate table aggregated_scores_by_city;
 
--- ciencias da natureza
+-- Ciências da Natureza
 insert into 
   aggregated_scores_by_city
 select 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.nature_sciences_score as float) / 1.0000000001) / 100 + 1), count(*)
+  r.city_id, r.city, r.year, es.id, trunc((cast(trim(both ' ' from r.nature_sciences_score) as float) / 1.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias da natureza'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'Ciências da Natureza'
 where 
-  r.year = 2011 and r.nature_sciences_score is not null 
+  r.year = 2011 and r.present_in_nature_sciences_exam = 1
 group by 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.nature_sciences_score as float) / 1.0000000001) / 100 + 1)
+  r.city_id, r.city, r.year, es.id, trunc((cast(trim(both ' ' from r.nature_sciences_score) as float) / 1.0000000001) / 100 + 1)
 order by 
   5;
 
--- ciencias humanas
+-- Ciências Humanas
 insert into 
   aggregated_scores_by_city
 select 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.human_sciences_score as float) / 1.0000000001) / 100 + 1), count(*)
+  r.city_id, r.city, r.year, es.id, trunc((cast(trim(both ' ' from r.human_sciences_score) as float) / 1.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r inner join enem_subjects es on es.name = 'ciencias humanas'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'Ciências Humanas'
 where 
-  r.year = 2011 and r.human_sciences_score is not null 
+  r.year = 2011 and r.present_in_human_sciences_exam = 1
 group by 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.human_sciences_score as float) / 1.0000000001) / 100 + 1)
+  r.city_id, r.city, r.year, es.id, trunc((cast(trim(both ' ' from r.human_sciences_score) as float) / 1.0000000001) / 100 + 1)
 order by 
   5;
 
--- linguagens e codigos
+-- Linguagens e Códigos
 insert into 
   aggregated_scores_by_city
 select 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.languages_and_codes_score as float) / 1.0000000001) / 100 + 1), count(*)
+  r.city_id, r.city, r.year, es.id, trunc((cast(trim(both ' ' from r.languages_and_codes_score) as float) / 1.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r inner join enem_subjects es on es.name = 'linguagens e codigos'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'Linguagens e Códigos'
 where 
-  r.year = 2011 and r.languages_and_codes_score is not null 
+  r.year = 2011 and r.present_in_languages_and_codes_exam = 1
 group by 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.languages_and_codes_score as float) / 1.0000000001) / 100 + 1)
+  r.city_id, r.city, r.year, es.id, trunc((cast(trim(both ' ' from r.languages_and_codes_score) as float) / 1.0000000001) / 100 + 1)
 order by 
   5;
   
--- matematica
+-- Matemática
 insert into 
   aggregated_scores_by_city
 select 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.math_score as float) / 1.0000000001) / 100 + 1), count(*)
+  r.city_id, r.city, r.year, es.id, trunc((cast(trim(both ' ' from r.math_score) as float) / 1.0000000001) / 100 + 1), count(*)
 from 
-  raw_enem_scores r inner join enem_subjects es on es.name = 'matematica'
+  raw_enem_scores r inner join enem_subjects es on es.name = 'Matemática'
 where 
-  r.year = 2011 and r.math_score is not null 
+  r.year = 2011 and r.present_in_math_exam = 1
 group by 
-  r.city_id, r.city, r.year, es.id, trunc((cast(r.math_score as float) / 1.0000000001) / 100 + 1)
+  r.city_id, r.city, r.year, es.id, trunc((cast(trim(both ' ' from r.math_score) as float) / 1.0000000001) / 100 + 1)
 order by 
   5;
