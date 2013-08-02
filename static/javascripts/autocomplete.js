@@ -21,7 +21,7 @@ $(function() {
       window.viewModel.cityId(ui.item.id);
       window.viewModel.cityName(ui.item.value);
       
-      $('#school-container').show();  // Show the school container (label + autocomplete).
+      $('#school-container').show();  // Show the school container (label + autocomplete), since it will be hidden when the page first loads.
       $('#school').val('');           // Reset the school (autocomplete) input text.
       $('#chartContainer').hide();    // Hide the chart.
     }
