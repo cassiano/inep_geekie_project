@@ -14,27 +14,35 @@
 	<h1>Comparador de performance de escolas no Enem</h1>
 	
 	<br />
-  <label for='school'>Área: </label>
-	<!-- TODO: Fetch data from server (API still missing). -->
+  <label for='enem_subject'>Área: </label>
   <select id='enem_subject' data-bind='value: enemSubject'>
-		<option value='NAT'>Ciências da Natureza</value>
-		<option value='HUM'>Ciências Humanas</value>
-		<option value='MAT'>Matemática</value>
-		<option value='LIN'>Linguagens e Códigos</value>
+		{% for es in enem_subjects %}
+			<option value='{{ es.id }}'>{{ es.name }}</value>
+		{% endfor %}
 	</select>
-	<br />
 
-  <label for='school'>Ano: </label>
-	<!-- TODO: Fetch data from server (API still missing). -->
+  <label for='year'>Ano: </label>
   <select id='year' data-bind='value: year'>
-		<option value='2011'>2011</value>
+		{% for y in years %}
+			<option value='{{ y }}'>{{ y }}</value>
+		{% endfor %}
 	</select>
-	<br />
-	<br />
+
+  <label for='state'>Estado: </label>
+  <select id='state' data-bind='value: state'>
+		{% for s in states %}
+			<option value='{{ s.state }}'>{{ s.state }}</value>
+		{% endfor %}
+	</select>
+
+	<div class='ui-widget'>
+	  <label for='city'>Cidade: </label>
+	  <input id='city' size='40' placeholder='Selecione uma cidade' />
+	</div>
 
 	<div class='ui-widget'>
 	  <label for='school'>Escola: </label>
-	  <input id='school' size='50' placeholder='Selecione uma escola' />
+	  <input id='school' size='40' placeholder='Selecione uma escola' />
 	</div>
 
 	<br />

@@ -1,27 +1,34 @@
+function syncGetJSON(url) {
+  var json;
+  
+  $.ajax({
+    type: 'GET',
+    url: url,
+    dataType: 'json',
+    success: function(data) { json = data; },
+    data: {},
+    async: false
+  });
+  
+  return json;
+}
+
 $(function() {
   function ViewModel() {
     self = this;
     
-		self.year         = ko.observable(2011);
-		self.enemSubject  = ko.observable('NAT');
-		self.cityId       = ko.observable(3550308);
-    self.cityName     = ko.observable('São Paulo');
+    self.state        = ko.observable();
+		self.year         = ko.observable();
+		self.enemSubject  = ko.observable();
+		self.cityId       = ko.observable();
+    self.cityName     = ko.observable();
     self.schoolId     = ko.observable();
     self.schoolName   = ko.observable();
 
     self.citySeriesData = ko.computed(function() {
-      var series;
+      if (self.cityId() == undefined || self.year() == undefined || self.enemSubject() == undefined) return;
       
-      $.ajax({
-        type: 'GET',
-        url: '/cities/' + self.cityId() +'/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json',
-        dataType: 'json',
-        success: function(data) { series = data; },
-        data: {},
-        async: false
-      });
-      
-      return series;
+      return syncGetJSON('/cities/' + self.cityId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json');
     });
 
     self.chartOptions = {
@@ -31,14 +38,7 @@ $(function() {
         var schoolSeriesData, dataSource = [], cityTotal = 0.0, schoolTotal = 0.0;
 
         // Get the selected school data series.
-        $.ajax({
-          type: 'GET',
-          url: '/schools/' + self.schoolId() +'/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json',
-          dataType: 'json',
-          success: function(data) { schoolSeriesData = data; },
-          data: {},
-          async: false
-        });
+        schoolSeriesData = syncGetJSON('/schools/' + self.schoolId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json');
       
         // Show the chart, since it will be hidden when the page first loads.
         $('#chartContainer').show();

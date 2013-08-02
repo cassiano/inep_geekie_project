@@ -9,7 +9,7 @@ DEBUG                   = True
 SECRET_KEY              = 'development key'
 SQLALCHEMY_DATABASE_URI = environ.get('HEROKU_POSTGRESQL_OLIVE_URL') or 'postgres://cassiano:@localhost:5432/inep'
 
-# Create the application.
+# Application initialization.
 app = Flask(__name__)
 app.config.from_object(__name__)
 db = SQLAlchemy(app)
@@ -39,7 +39,11 @@ class School(db.Model):
         
     @classmethod
     def search(cls, city_id, term):
-        return cls.query.filter_by(city_id=city_id).filter(cls.name.contains(term.upper()))
+        return cls.query.filter_by(city_id=city_id).filter(cls.name.contains(term.upper())).order_by(School.name)
+
+    @classmethod
+    def search_cities(cls, state, term):
+        return cls.query.filter_by(state=state.upper()).distinct(School.city).filter(cls.city.contains(term.upper())).order_by(School.city)
 
 class AggregatedScoreBySchool(db.Model):
     __tablename__ = 'aggregated_scores_by_school'
@@ -110,20 +114,24 @@ class EnemSubject(db.Model):
         return '<Enem Subject %s>' % self.name
 
 ##############################
-# Flask routes
+# Enem Subjects routes
 ##############################
 
-@app.route("/schools/<id>.json")
-def school_show(id):
-    school = School.query.filter_by(id=id).first()
+# @app.route("/enem_subjects.json")
+# def enem_subjects_index():
+#     return jsonify({ 'enem_subjects': [[es.id, es.name] for es in EnemSubject.query] })
 
-    if school is None: abort(404)
+##############################
+# Schools routes
+##############################
 
-    return jsonify(id=id, name=school.name, state=school.state, city_id=school.city_id, city=school.city)
-
-@app.route("/enem_subjects.json")
-def enem_subjects_index():
-    return jsonify([[es.id, es.name] for es in EnemSubject.query])
+# @app.route("/schools/<id>.json")
+# def schools_show(id):
+#     school = School.query.filter_by(id=id).first()
+# 
+#     if school is None: abort(404)
+# 
+#     return jsonify(id=id, name=school.name, state=school.state, city_id=school.city_id, city=school.city)
 
 @app.route("/schools/<id>/aggregated_scores/<year>/<enem_subject_id>.json")
 def aggregated_scores_by_school_index(id, year, enem_subject_id):
@@ -135,11 +143,16 @@ def aggregated_scores_by_school_index(id, year, enem_subject_id):
         
     return jsonify([[a.score_range, a.student_count] for a in aggregated_scores])
 
-@app.route("/states/<state>/aggregated_scores/<year>/<enem_subject_id>.json")
-def aggregated_scores_by_state_index(state, year, enem_subject_id):
-    aggregated_scores = AggregatedScoreByState.aggregated_scores_by_state_and_year_and_enem_subject_id(state, year, enem_subject_id)
+@app.route("/schools/search/<city_id>.json")
+def schools_search(city_id):
+    term = request.args.get('term', '')
+    schools = School.search(city_id, term)
         
-    return jsonify([[a.score_range, a.student_count] for a in aggregated_scores])
+    return jsonify({ 'schools': [{ 'id': s.id, 'value': s.name.title() } for s in schools] })
+
+##############################
+# Cities routes
+##############################
 
 @app.route("/cities/<city_id>/aggregated_scores/<year>/<enem_subject_id>.json")
 def aggregated_scores_by_city_index(city_id, year, enem_subject_id):
@@ -147,13 +160,51 @@ def aggregated_scores_by_city_index(city_id, year, enem_subject_id):
         
     return jsonify([[a.score_range, a.student_count] for a in aggregated_scores])
 
-@app.route("/schools/search/<city_id>.json")
-def school_search(city_id):
-    term = request.args.get('term', '')
-    schools = School.search(city_id, term)
+# @app.route("/cities/<id>.json")
+# def cities_show(id):
+#     city = School.query.filter_by(city_id=id).first()
+# 
+#     if city is None: abort(404)
+# 
+#     return jsonify(id=id, name=city.city, state=city.state)
+
+##############################
+# States routes
+##############################
+
+# @app.route("/states/<state>/aggregated_scores/<year>/<enem_subject_id>.json")
+# def aggregated_scores_by_state_index(state, year, enem_subject_id):
+#     aggregated_scores = AggregatedScoreByState.aggregated_scores_by_state_and_year_and_enem_subject_id(state, year, enem_subject_id)
+#         
+#     return jsonify([[a.score_range, a.student_count] for a in aggregated_scores])
+
+# @app.route("/states/<state>/cities.json")
+# def states_cities_index(state):
+#     cities = School.query.filter_by(state=state).distinct(School.city_id, School.city).order_by(School.city)
+#         
+#     return jsonify({ 'cities': [{ 'id': c.city_id, 'value': c.city.title() } for c in cities] })
+
+# @app.route("/states.json")
+# def states_index():
+#     states = School.query.distinct(School.state).order_by(School.state)
+#         
+#     return jsonify({ 'states': [{ 'id': s.state, 'value': s.state } for s in states] })
+
+@app.route("/states/<state>/cities/search.json")
+def states_cities_search(state):
+    term   = request.args.get('term', '')
+    cities = School.search_cities(state, term)
         
-    return jsonify({ 'schools': [{ 'id': s.id, 'value': s.name.title() } for s in schools] })
+    return jsonify({ 'cities': [{ 'id': c.city_id, 'value': c.city.title() } for c in cities] })
+
+##############################
+# Root route
+##############################
 
 @app.route('/')
 def show_main_page():
-    return render_template('main_page.html')
+    enem_subjects = EnemSubject.query
+    states        = School.query.distinct(School.state).order_by(School.state)
+    years         = [2011, 2012]      # TODO: fetch from database.
+    
+    return render_template('main_page.html', enem_subjects=enem_subjects, states=states, years=years)
