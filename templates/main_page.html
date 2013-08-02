@@ -21,26 +21,31 @@
   			<option value='{{ es.id }}'>{{ es.name }}</value>
   		{% endfor %}
   	</select>
+	</div>
 
+	<div class='ui-widget'>
     <label for='year'>Ano: </label>
     <select id='year' data-bind='value: year'>
   		{% for y in years %}
   			<option value='{{ y }}'>{{ y }}</value>
   		{% endfor %}
   	</select>
+	</div>
 
+	<div class='ui-widget'>
     <label for='state'>Estado: </label>
     <select id='state' data-bind='value: state'>
   		{% for s in states %}
   			<option value='{{ s.state }}'>{{ s.state }}</value>
   		{% endfor %}
   	</select>
+	</div>
 
-  	<br />
+	<div class='ui-widget'>
     <label for='city'>Cidade: </label>
     <input id='city' size='40' placeholder='Selecione uma cidade' />
 
-  	<br />
+	<div id='school-container' class='ui-widget' style='display: none;'>
 	  <label for='school'>Escola: </label>
 	  <input id='school' size='40' placeholder='Selecione uma escola' />
 	</div>
