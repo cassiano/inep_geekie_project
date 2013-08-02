@@ -17,9 +17,9 @@ $(function() {
   function ViewModel() {
     self = this;
     
-    self.state        = ko.observable();
-		self.year         = ko.observable();
 		self.enemSubject  = ko.observable();
+		self.year         = ko.observable();
+    self.state        = ko.observable();
 		self.cityId       = ko.observable();
     self.cityName     = ko.observable();
     self.schoolId     = ko.observable();
@@ -52,7 +52,7 @@ $(function() {
           dataSource[i] = {
             scoreRange: i + '-' + (i + 1), 
             school: schoolTotal > 0 ? (schoolSeriesData[i]      / schoolTotal || 0) * 100.0 : 0.0,
-            average: cityTotal  > 0 ? (self.citySeriesData()[i] / cityTotal   || 0) * 100.0 : 0.0
+            city:   cityTotal   > 0 ? (self.citySeriesData()[i] / cityTotal   || 0) * 100.0 : 0.0
           }
         }
 
@@ -64,7 +64,7 @@ $(function() {
 
         return [
           { valueField: 'school', name: self.schoolName() },
-          { valueField: 'average', name: 'Média da cidade de ' + self.cityName() }
+          { valueField: 'city',   name: 'Média da cidade de ' + self.cityName() }
         ];
       }),
 

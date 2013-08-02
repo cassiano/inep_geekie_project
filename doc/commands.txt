@@ -1,6 +1,9 @@
 # Starting Postgres:
 pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start
 
+# Backup up Postgres:
+PGPASSWORD= /usr/local/bin/pg_dump -Fc --no-acl --no-owner -h localhost -U cassiano inep > ~/tmp/inep.dump
+
 # Filtering records:
 awk 'substr($0,212,7)=="3550308" {print}' DADOS_ENEM_2011.TXT >enem_cidade_sao_paulo.txt 
 
