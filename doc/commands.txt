@@ -23,7 +23,7 @@ wc -l escolas_estado_sao_paulo.csv
 # Start the HTTP server:
 foreman start
 
-# Some Heroku commands (https://devcenter.heroku.com/articles/python):
+# Some Heroku commands (https://devcenter.heroku.com/articles/python, https://devcenter.heroku.com/articles/heroku-postgresql, https://devcenter.heroku.com/articles/heroku-postgres-import-export#import):
 heroku create
 git push heroku master
 heroku open

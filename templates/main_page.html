@@ -14,33 +14,33 @@
 	<h1>Comparador de performance de escolas no Enem</h1>
 	
 	<br />
-  <label for='enem_subject'>Área: </label>
-  <select id='enem_subject' data-bind='value: enemSubject'>
-		{% for es in enem_subjects %}
-			<option value='{{ es.id }}'>{{ es.name }}</value>
-		{% endfor %}
-	</select>
-
-  <label for='year'>Ano: </label>
-  <select id='year' data-bind='value: year'>
-		{% for y in years %}
-			<option value='{{ y }}'>{{ y }}</value>
-		{% endfor %}
-	</select>
-
-  <label for='state'>Estado: </label>
-  <select id='state' data-bind='value: state'>
-		{% for s in states %}
-			<option value='{{ s.state }}'>{{ s.state }}</value>
-		{% endfor %}
-	</select>
-
 	<div class='ui-widget'>
-	  <label for='city'>Cidade: </label>
-	  <input id='city' size='40' placeholder='Selecione uma cidade' />
-	</div>
+    <label for='enem_subject'>Área: </label>
+    <select id='enem_subject' data-bind='value: enemSubject'>
+  		{% for es in enem_subjects %}
+  			<option value='{{ es.id }}'>{{ es.name }}</value>
+  		{% endfor %}
+  	</select>
 
-	<div class='ui-widget'>
+    <label for='year'>Ano: </label>
+    <select id='year' data-bind='value: year'>
+  		{% for y in years %}
+  			<option value='{{ y }}'>{{ y }}</value>
+  		{% endfor %}
+  	</select>
+
+    <label for='state'>Estado: </label>
+    <select id='state' data-bind='value: state'>
+  		{% for s in states %}
+  			<option value='{{ s.state }}'>{{ s.state }}</value>
+  		{% endfor %}
+  	</select>
+
+  	<br />
+    <label for='city'>Cidade: </label>
+    <input id='city' size='40' placeholder='Selecione uma cidade' />
+
+  	<br />
 	  <label for='school'>Escola: </label>
 	  <input id='school' size='40' placeholder='Selecione uma escola' />
 	</div>
