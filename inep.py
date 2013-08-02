@@ -114,24 +114,8 @@ class EnemSubject(db.Model):
         return '<Enem Subject %s>' % self.name
 
 ##############################
-# Enem Subjects routes
-##############################
-
-# @app.route("/enem_subjects.json")
-# def enem_subjects_index():
-#     return jsonify({ 'enem_subjects': [[es.id, es.name] for es in EnemSubject.query] })
-
-##############################
 # Schools routes
 ##############################
-
-# @app.route("/schools/<id>.json")
-# def schools_show(id):
-#     school = School.query.filter_by(id=id).first()
-# 
-#     if school is None: abort(404)
-# 
-#     return jsonify(id=id, name=school.name, state=school.state, city_id=school.city_id, city=school.city)
 
 @app.route("/schools/<id>/aggregated_scores/<year>/<enem_subject_id>.json")
 def aggregated_scores_by_school_index(id, year, enem_subject_id):
@@ -160,35 +144,9 @@ def aggregated_scores_by_city_index(city_id, year, enem_subject_id):
         
     return jsonify([[a.score_range, a.student_count] for a in aggregated_scores])
 
-# @app.route("/cities/<id>.json")
-# def cities_show(id):
-#     city = School.query.filter_by(city_id=id).first()
-# 
-#     if city is None: abort(404)
-# 
-#     return jsonify(id=id, name=city.city, state=city.state)
-
 ##############################
 # States routes
 ##############################
-
-# @app.route("/states/<state>/aggregated_scores/<year>/<enem_subject_id>.json")
-# def aggregated_scores_by_state_index(state, year, enem_subject_id):
-#     aggregated_scores = AggregatedScoreByState.aggregated_scores_by_state_and_year_and_enem_subject_id(state, year, enem_subject_id)
-#         
-#     return jsonify([[a.score_range, a.student_count] for a in aggregated_scores])
-
-# @app.route("/states/<state>/cities.json")
-# def states_cities_index(state):
-#     cities = School.query.filter_by(state=state).distinct(School.city_id, School.city).order_by(School.city)
-#         
-#     return jsonify({ 'cities': [{ 'id': c.city_id, 'value': c.city.title() } for c in cities] })
-
-# @app.route("/states.json")
-# def states_index():
-#     states = School.query.distinct(School.state).order_by(School.state)
-#         
-#     return jsonify({ 'states': [{ 'id': s.state, 'value': s.state } for s in states] })
 
 @app.route("/states/<state>/cities/search.json")
 def states_cities_search(state):
