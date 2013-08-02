@@ -38,3 +38,7 @@ heroku ps
 heroku logs
 heroku pgbackups:restore HEROKU_POSTGRESQL_OLIVE_URL 'https://www.dropbox.com/s/ekh1xpantoh9rpb/inep.dump'
 heroku addons:add pgbackups
+
+# Virtualenv
+virtualenv venv --distribute
+source venv/bin/activate

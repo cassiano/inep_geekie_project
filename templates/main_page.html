@@ -14,6 +14,24 @@
 	<h1>Comparador de performance de escolas no Enem</h1>
 	
 	<br />
+  <label for='school'>Área: </label>
+	<!-- TODO: Fetch data from server (API still missing). -->
+  <select id='enem_subject' data-bind='value: enemSubject'>
+		<option value='NAT'>Ciências da Natureza</value>
+		<option value='HUM'>Ciências Humanas</value>
+		<option value='MAT'>Matemática</value>
+		<option value='LIN'>Linguagens e Códigos</value>
+	</select>
+	<br />
+
+  <label for='school'>Ano: </label>
+	<!-- TODO: Fetch data from server (API still missing). -->
+  <select id='year' data-bind='value: year'>
+		<option value='2011'>2011</value>
+	</select>
+	<br />
+	<br />
+
 	<div class='ui-widget'>
 	  <label for='school'>Escola: </label>
 	  <input id='school' size='50' placeholder='Selecione uma escola' />
