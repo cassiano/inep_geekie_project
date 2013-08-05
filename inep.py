@@ -65,12 +65,36 @@ class School(db.Model):
     # Relationships.
     enem_subscriptions = db.relationship('EnemSubscription')
             
+    def __repr__(self):
+        return "<School('%s')>" % self.name
+
     @classmethod
     def search(cls, city_code_context, term):
         return cls.query.filter_by(city_code=city_code_context).filter(cls.name.contains(term.upper())).order_by(School.name)
 
-    def __repr__(self):
-        return "<School('%s')>" % self.name
+    @classmethod
+    def aggregated_scores(cls, city_id, year, enem_subject):
+      # TODO: write the SQL code below purely in Python, using the SQLAlchemy API.
+      sql_statement = """
+          select 
+              n.range1, 
+              count(*) as count 
+          from 
+              facts_enem_subscriptions f 
+          inner join 
+              dim_{0}_scores n on f.{0}_score_id = n.id 
+          inner join 
+              dim_schools s on f.school_id = s.id 
+          where 
+              s.id = :id and 
+              f.year = :year 
+          group by 
+              n.range1 
+          order by 
+              n.range1
+      """.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0])
+
+      return db.session.query('range1', 'count').from_statement(sql_statement).params(id=city_id, year=year)
 
 class City(db.Model):
     __tablename__ = 'cities'
@@ -88,6 +112,30 @@ class City(db.Model):
     def search(cls, state_context, term):
         return cls.query.filter_by(state=state_context).filter(cls.name.contains(term.upper())).order_by(City.name)
 
+    @classmethod
+    def aggregated_scores(cls, city_code, year, enem_subject):
+        # TODO: write the SQL code below purely in Python, using the SQLAlchemy API.
+        sql_statement = """
+            select 
+                n.range1, 
+                count(*) as count 
+            from 
+                facts_enem_subscriptions f 
+            inner join 
+                dim_{0}_scores n on f.{0}_score_id = n.id 
+            inner join 
+                dim_schools s on f.school_id = s.id 
+            where 
+                s.city_code = :city_code and 
+                f.year = :year 
+            group by 
+                n.range1 
+            order by 
+                n.range1
+        """.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0])
+
+        return db.session.query('range1', 'count').from_statement(sql_statement).params(city_code=city_code, year=year)
+
 class State(db.Model):
     __tablename__ = 'states'
     
@@ -103,40 +151,13 @@ class State(db.Model):
 
 @app.route("/schools/<id>/aggregated_scores/<year>/<enem_subject>.json")
 def aggregated_scores_by_school(id, year, enem_subject):
-    school = School.query.filter_by(id=id).first()
-    
-    if school is None: abort(404)
-
-    # TODO: write the SQL code below purely in Python, using the SQLAlchemy API.
-    sql_statement = """
-        select 
-            n.range1, 
-            count(*) as count 
-        from 
-            facts_enem_subscriptions f 
-        inner join 
-            dim_{0}_scores n on f.{0}_score_id = n.id 
-        inner join 
-            dim_schools s on f.school_id = s.id 
-        where 
-            s.id = :id and 
-            f.year = :year 
-        group by 
-            n.range1 
-        order by 
-            n.range1
-    """.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0])
-    
-    aggregated_scores = db.session.query('range1', 'count').from_statement(sql_statement).params(id=id, year=year)
-        
-    return jsonify([[a.range1, a.count] for a in aggregated_scores])
+    return jsonify([[a.range1, a.count] for a in School.aggregated_scores(id, year, enem_subject)])
 
 @app.route("/schools/search/<city_code>.json")
 def search_schools_in_city(city_code):
     term = request.args.get('term', '')
-    schools = School.search(city_code, term)
         
-    return jsonify({ 'schools': [{ 'id': s.id, 'value': s.name.title() } for s in schools] })
+    return jsonify({ 'schools': [{ 'id': s.id, 'value': s.name.title() } for s in School.search(city_code, term)] })
 
 ##############################
 # Cities routes
@@ -144,29 +165,7 @@ def search_schools_in_city(city_code):
 
 @app.route("/cities/<city_code>/aggregated_scores/<year>/<enem_subject>.json")
 def aggregated_scores_by_city(city_code, year, enem_subject):
-    # TODO: write the SQL code below purely in Python, using the SQLAlchemy API.
-    sql_statement = """
-        select 
-            n.range1, 
-            count(*) as count 
-        from 
-            facts_enem_subscriptions f 
-        inner join 
-            dim_{0}_scores n on f.{0}_score_id = n.id 
-        inner join 
-            dim_schools s on f.school_id = s.id 
-        where 
-            s.city_code = :city_code and 
-            f.year = :year 
-        group by 
-            n.range1 
-        order by 
-            n.range1
-    """.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0])
-    
-    aggregated_scores = db.session.query('range1', 'count').from_statement(sql_statement).params(city_code=city_code, year=year)
-        
-    return jsonify([[a.range1, a.count] for a in aggregated_scores])
+    return jsonify([[a.range1, a.count] for a in City.aggregated_scores(city_code, year, enem_subject)])
 
 ##############################
 # States routes
@@ -174,10 +173,9 @@ def aggregated_scores_by_city(city_code, year, enem_subject):
 
 @app.route("/states/<state>/cities/search.json")
 def search_cities_in_state(state):
-    term   = request.args.get('term', '')
-    cities = City.search(state, term)
-        
-    return jsonify({ 'cities': [{ 'id': c.id, 'value': c.name.title() } for c in cities] })
+    term = request.args.get('term', '')
+
+    return jsonify({ 'cities': [{ 'id': c.id, 'value': c.name.title() } for c in City.search(state, term)] })
 
 ##############################
 # Root route
