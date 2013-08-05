@@ -5,15 +5,18 @@ $(function() {
     minLength: 3,
     source: function(request, response) {
       var term = request.term;
+      var state = window.viewModel.state();
 
-      if (term in cache.cities) {
-        response(cache.cities[term]);
+      if (term in (cache.cities[state] || {})) {
+        response(cache.cities[state][term]);
         return;
       }
 
-      $.getJSON('/states/' + window.viewModel.state() + '/cities/search.json', request, function(data, status, xhr) {
-        cache.cities[term] = data.cities;
-        response(cache.cities[term]);
+      $.getJSON('/states/' + state + '/cities/search.json', request, function(data, status, xhr) {
+        cache.cities[state]       = cache.cities[state] || {};
+        cache.cities[state][term] = data.cities;
+
+        response(cache.cities[state][term]);
       });
     },
     select: function(event, ui) {
