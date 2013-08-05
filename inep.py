@@ -107,7 +107,6 @@ class City(db.Model):
     def __repr__(self):
         return "<City('%s')>" % self.name
 
-    # TODO: consider implementing this class method as an instance method of the State class.
     @classmethod
     def search(cls, state_context, term):
         return cls.query.filter_by(state=state_context).filter(cls.name.contains(term.upper())).order_by(City.name)
