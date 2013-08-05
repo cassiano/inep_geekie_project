@@ -30,16 +30,19 @@ $(function() {
   $('#school').autocomplete({
     minLength: 3,
     source: function(request, response) {
-      var term = request.term;
+      var term   = request.term;
+      var cityId = window.viewModel.cityId();
 
-      if (term in cache.schools) {
-        response(cache.schools[term]);
+      if (term in (cache.schools[cityId] || {})) {
+        response(cache.schools[cityId][term]);
         return;
       }
 
-      $.getJSON('/schools/search/' + window.viewModel.cityId() + '.json', request, function(data, status, xhr) {
-        cache.schools[term] = data.schools;
-        response(cache.schools[term]);
+      $.getJSON('/schools/search/' + cityId + '.json', request, function(data, status, xhr) {
+        cache.schools[cityId]       = cache.schools[cityId] || {};
+        cache.schools[cityId][term] = data.schools;
+
+        response(cache.schools[cityId][term]);
       });
     },
     select: function(event, ui) {
