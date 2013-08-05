@@ -9,7 +9,6 @@ from sqlalchemy import func
 from operator import itemgetter
 
 # Configuration.
-DEBUG                   = True
 SECRET_KEY              = 'development key'
 SQLALCHEMY_DATABASE_URI = environ.get('HEROKU_POSTGRESQL_OLIVE_URL', 'postgres://cassiano:@localhost:5432/inep')
 
