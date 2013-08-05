@@ -1,22 +1,22 @@
 ﻿drop table if exists dim_schools;
 
 create table dim_schools as
-select distinct 
-  0 as id,  -- Autonumbered PK. Will be updated later on!
-  es.school_id as code, 
-  coalesce(
-    trim(s.name), 
-    '[ESCOLA DESCONHECIDA COM CODIGO ' || es.school_id || ' EM ' || trim(es.city) || '-' || es.state || ']'
-  ) as name,
-  es.city_id as city_code, 
-  trim(es.city) as city, 
-  es.state
-from
-  raw_enem_scores es left outer join raw_schools s on es.school_id = s.id
-where
-  es.school_id is not null and trim(es.school_id) <> '.'
-order by
-  2;
+  select distinct 
+    0 as id,  -- Autonumbered PK. Will be updated later on!
+    es.school_code as code, 
+    coalesce(
+      trim(s.name), 
+      '[ESCOLA DESCONHECIDA COM CODIGO ' || es.school_code || ' EM ' || trim(es.city) || '-' || es.state || ']'
+    ) as name,
+    es.city_code, 
+    trim(es.city) as city, 
+    es.state
+  from
+    raw_enem_scores es left outer join raw_schools s on es.school_code = s.code
+  where
+    es.school_code is not null and trim(es.school_code) <> '.'
+  order by
+    2;
 
 drop sequence if exists temp_seq;
 create temp sequence temp_seq;

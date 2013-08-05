@@ -1,26 +1,26 @@
 ﻿drop table if exists facts_enem_subscriptions;
 
 create table facts_enem_subscriptions as
-select 
-  es.subscription_id as id,
-  es.year,
-  ds.id as school_id,
-  nat.id as nature_sciences_score_id,
-  his.id as human_sciences_score_id,
-  lan.id as languages_and_codes_score_id,
-  mat.id as math_score_id
-from
-  raw_enem_scores es 
-left outer join 
-  dim_schools ds on es.school_id = ds.code
-left outer join 
-  dim_nature_sciences_scores nat on es.present_in_nature_sciences_exam = 1 and cast(nullif(trim(es.nature_sciences_score), '.') as float) = nat.score
-left outer join 
-  dim_human_sciences_scores his on es.present_in_human_sciences_exam = 1 and cast(nullif(trim(es.human_sciences_score), '.') as float) = his.score
-left outer join 
-  dim_languages_and_codes_scores lan on es.present_in_languages_and_codes_exam = 1 and cast(nullif(trim(es.languages_and_codes_score), '.') as float) = lan.score
-left outer join 
-  dim_math_scores mat on es.present_in_math_exam = 1 and cast(nullif(trim(es.math_score), '.') as float) = mat.score;
+  select 
+    es.subscription_code as id,
+    es.year,
+    ds.id as school_id,
+    nat.id as nature_sciences_score_id,
+    his.id as human_sciences_score_id,
+    lan.id as languages_and_codes_score_id,
+    mat.id as math_score_id
+  from
+    raw_enem_scores es 
+  left outer join 
+    dim_schools ds on es.school_code = ds.code
+  left outer join 
+    dim_nature_sciences_scores nat on es.present_in_nature_sciences_exam = 1 and cast(nullif(trim(es.nature_sciences_score), '.') as float) = nat.score
+  left outer join 
+    dim_human_sciences_scores his on es.present_in_human_sciences_exam = 1 and cast(nullif(trim(es.human_sciences_score), '.') as float) = his.score
+  left outer join 
+    dim_languages_and_codes_scores lan on es.present_in_languages_and_codes_exam = 1 and cast(nullif(trim(es.languages_and_codes_score), '.') as float) = lan.score
+  left outer join 
+    dim_math_scores mat on es.present_in_math_exam = 1 and cast(nullif(trim(es.math_score), '.') as float) = mat.score;
 
 alter table facts_enem_subscriptions add primary key (id);
 alter table facts_enem_subscriptions add constraint school_id foreign key (school_id) references dim_schools (id) match full;
