@@ -1,136 +1,141 @@
+# -*- coding: UTF-8 -*-
+
 # Imports.
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash, json, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
 from os import environ
+from sqlalchemy import func
+from operator import itemgetter
 
 # Configuration.
 DEBUG                   = True
 SECRET_KEY              = 'development key'
-SQLALCHEMY_DATABASE_URI = environ.get('HEROKU_POSTGRESQL_OLIVE_URL') or 'postgres://cassiano:@localhost:5432/inep'
+SQLALCHEMY_DATABASE_URI = environ.get('HEROKU_POSTGRESQL_OLIVE_URL', 'postgres://cassiano:@localhost:5432/inep')
 
 # Application initialization.
 app = Flask(__name__)
 app.config.from_object(__name__)
 db = SQLAlchemy(app)
 
+# Constants.
+ENEM_SUBJECTS_MAPPING = { 
+    'NAT': ['nature_sciences',      u'Ciências da Natureza'],
+    'HUM': ['human_sciences',       u'Ciências Humanas'],
+    'LAN': ['languages_and_codes',  u'Linguagens e Códigos'],
+    'MAT': ['math',                 u'Matemática']
+}
+
 ##############################
 # SQLAlchemy domain models
 ##############################
 
+class EnemSubscription(db.Model):
+    __tablename__ = 'facts_enem_subscriptions'
+    
+    # Columns.
+    id                           = db.Column(db.String(12), primary_key=True)
+    year                         = db.Column(db.Integer)
+    school_id                    = db.Column(db.Integer, db.ForeignKey('dim_schools.id'))
+    nature_sciences_score_id     = db.Column(db.Integer, db.ForeignKey('dim_nature_sciences_scores.id'))
+    human_sciences_score_id      = db.Column(db.Integer, db.ForeignKey('dim_human_sciences_scores.id'))
+    languages_and_codes_score_id = db.Column(db.Integer, db.ForeignKey('dim_languages_and_codes_scores.id'))
+    math_score_id                = db.Column(db.Integer, db.ForeignKey('dim_math_scores.id'))
+    
+    # Relationships. PS: Additional relationships (e.g. nature_sciences_score, human_sciences_score etc) might be implemented later, if necessary.
+    school = db.relationship('School')
+
+    def __repr__(self):
+        return "<EnemSubscription('%s')>" % self.id
+        
+    @classmethod
+    def years(cls):
+        return [es.year for es in cls.query.distinct(cls.year).order_by(cls.year)]
+
 class School(db.Model):
-    __tablename__ = 'schools'
+    __tablename__ = 'dim_schools'
     
     # Columns.
-    id      = db.Column(db.String(8), primary_key=True)
-    name    = db.Column(db.String(255))
-    state   = db.Column(db.String(2))
-    city_id = db.Column(db.String(7))
-    city    = db.Column(db.String(255))
+    id        = db.Column(db.Integer, primary_key=True)
+    code      = db.Column(db.String(8))
+    name      = db.Column(db.String(255))
+    city_code = db.Column(db.String(7))
+    city      = db.Column(db.String(255))
+    state     = db.Column(db.String(2))
+
+    # Relationships.
+    enem_subscriptions = db.relationship('EnemSubscription')
+            
+    @classmethod
+    def search(cls, city_code_context, term):
+        return cls.query.filter_by(city_code=city_code_context).filter(cls.name.contains(term.upper())).order_by(School.name)
+
+    def __repr__(self):
+        return "<School('%s')>" % self.name
+
+class City(db.Model):
+    __tablename__ = 'cities'
     
-    # Relationships.
-    aggregated_scores = db.relationship('AggregatedScoreBySchool', order_by='AggregatedScoreBySchool.enem_subject_id, AggregatedScoreBySchool.score_range', lazy='dynamic')
+    # Columns.
+    id    = db.Column(db.String(7), primary_key=True)
+    name  = db.Column(db.String(255))
+    state = db.Column(db.String(2), db.ForeignKey('states.state'))
+            
+    def __repr__(self):
+        return "<City('%s')>" % self.name
+
+    # TODO: consider implementing this class method as an instance method of the State class.
+    @classmethod
+    def search(cls, state_context, term):
+        return cls.query.filter_by(state=state_context).filter(cls.name.contains(term.upper())).order_by(City.name)
+
+class State(db.Model):
+    __tablename__ = 'states'
     
-    def __repr__(self):
-        return '<School %s [%s-%s]>' % (self.name, self.city, self.state)
-
-    def aggregated_scores_by_year_and_enem_subject_id(self, year, enem_subject_id):
-        return self.aggregated_scores.filter_by(year=year, enem_subject_id=enem_subject_id.upper())
-        
-    @classmethod
-    def search(cls, city_id, term):
-        return cls.query.filter_by(city_id=city_id).filter(cls.name.contains(term.upper())).order_by(School.name)
-
-    @classmethod
-    def search_cities(cls, state, term):
-        return cls.query.filter_by(state=state.upper()).distinct(School.city).filter(cls.city.contains(term.upper())).order_by(School.city)
-
-class AggregatedScoreBySchool(db.Model):
-    __tablename__ = 'aggregated_scores_by_school'
-
     # Columns.
-    school_id       = db.Column(db.String(8), db.ForeignKey('schools.id'), primary_key=True)
-    year            = db.Column(db.Integer, primary_key=True)
-    enem_subject_id = db.Column(db.String(3), db.ForeignKey('enem_subjects.id'), primary_key=True)
-    score_range     = db.Column(db.Integer, primary_key=True)
-    student_count   = db.Column(db.Integer)
-
-    # Relationships.
-    school       = db.relationship('School')
-    enem_subject = db.relationship('EnemSubject')
-
+    state = db.Column(db.String(2), primary_key=True)
+            
     def __repr__(self):
-        return '<School Aggregate %s - %d - %s - %d - %d>' % (self.school.name, self.year, self.enem_subject.name, self.score_range, self.student_count)
-        
-class AggregatedScoreByState(db.Model):
-    __tablename__ = 'aggregated_scores_by_state'
-
-    # Columns.
-    state           = db.Column(db.String(2))
-    year            = db.Column(db.Integer, primary_key=True)
-    enem_subject_id = db.Column(db.String(3), db.ForeignKey('enem_subjects.id'), primary_key=True)
-    score_range     = db.Column(db.Integer, primary_key=True)
-    student_count   = db.Column(db.Integer)
-
-    # Relationships.
-    enem_subject = db.relationship('EnemSubject')
-
-    def __repr__(self):
-        return '<State Aggregate %s - %d - %s - %d - %d>' % (self.state, self.year, self.enem_subject.name, self.score_range, self.student_count)
-        
-    @classmethod
-    def aggregated_scores_by_state_and_year_and_enem_subject_id(cls, state, year, enem_subject_id):
-        return cls.query.filter_by(state=state.upper(), year=year, enem_subject_id=enem_subject_id.upper())
-
-class AggregatedScoreByCity(db.Model):
-    __tablename__ = 'aggregated_scores_by_city'
-
-    # Columns.
-    city_id         = db.Column(db.String(7))
-    city            = db.Column(db.String(255))
-    year            = db.Column(db.Integer, primary_key=True)
-    enem_subject_id = db.Column(db.String(3), db.ForeignKey('enem_subjects.id'), primary_key=True)
-    score_range     = db.Column(db.Integer, primary_key=True)
-    student_count   = db.Column(db.Integer)
-
-    # Relationships.
-    enem_subject = db.relationship('EnemSubject')
-
-    def __repr__(self):
-        return '<City Aggregate %s - %s - %d - %s - %d - %d>' % (self.city_id, self.city, self.year, self.enem_subject.name, self.score_range, self.student_count)
-        
-    @classmethod
-    def aggregated_scores_by_city_id_and_year_and_enem_subject_id(cls, city_id, year, enem_subject_id):
-        return cls.query.filter_by(city_id=city_id, year=year, enem_subject_id=enem_subject_id.upper())
-
-class EnemSubject(db.Model):
-    __tablename__ = 'enem_subjects'
-
-    # Columns.
-    id   = db.Column(db.String(3), primary_key=True)
-    name = db.Column(db.String(255))
-
-    def __repr__(self):
-        return '<Enem Subject %s>' % self.name
+        return "<State('%s')>" % self.state
 
 ##############################
 # Schools routes
 ##############################
 
-@app.route("/schools/<id>/aggregated_scores/<year>/<enem_subject_id>.json")
-def aggregated_scores_by_school_index(id, year, enem_subject_id):
+@app.route("/schools/<id>/aggregated_scores/<year>/<enem_subject>.json")
+def aggregated_scores_by_school(id, year, enem_subject):
     school = School.query.filter_by(id=id).first()
-
+    
     if school is None: abort(404)
 
-    aggregated_scores = school.aggregated_scores_by_year_and_enem_subject_id(year, enem_subject_id)
+    # TODO: write the SQL code below purely in Python, using the SQLAlchemy API.
+    sql_statement = """
+        select 
+            n.range1, 
+            count(*) as count 
+        from 
+            facts_enem_subscriptions f 
+        inner join 
+            dim_{0}_scores n on f.{0}_score_id = n.id 
+        inner join 
+            dim_schools s on f.school_id = s.id 
+        where 
+            s.id = :id and 
+            f.year = :year 
+        group by 
+            n.range1 
+        order by 
+            n.range1
+    """.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0])
+    
+    aggregated_scores = db.session.query('range1', 'count').from_statement(sql_statement).params(id=id, year=year)
         
-    return jsonify([[a.score_range, a.student_count] for a in aggregated_scores])
+    return jsonify([[a.range1, a.count] for a in aggregated_scores])
 
-@app.route("/schools/search/<city_id>.json")
-def schools_search(city_id):
+@app.route("/schools/search/<city_code>.json")
+def search_schools_in_city(city_code):
     term = request.args.get('term', '')
-    schools = School.search(city_id, term)
+    schools = School.search(city_code, term)
         
     return jsonify({ 'schools': [{ 'id': s.id, 'value': s.name.title() } for s in schools] })
 
@@ -138,22 +143,42 @@ def schools_search(city_id):
 # Cities routes
 ##############################
 
-@app.route("/cities/<city_id>/aggregated_scores/<year>/<enem_subject_id>.json")
-def aggregated_scores_by_city_index(city_id, year, enem_subject_id):
-    aggregated_scores = AggregatedScoreByCity.aggregated_scores_by_city_id_and_year_and_enem_subject_id(city_id, year, enem_subject_id)
+@app.route("/cities/<city_code>/aggregated_scores/<year>/<enem_subject>.json")
+def aggregated_scores_by_city(city_code, year, enem_subject):
+    # TODO: write the SQL code below purely in Python, using the SQLAlchemy API.
+    sql_statement = """
+        select 
+            n.range1, 
+            count(*) as count 
+        from 
+            facts_enem_subscriptions f 
+        inner join 
+            dim_{0}_scores n on f.{0}_score_id = n.id 
+        inner join 
+            dim_schools s on f.school_id = s.id 
+        where 
+            s.city_code = :city_code and 
+            f.year = :year 
+        group by 
+            n.range1 
+        order by 
+            n.range1
+    """.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0])
+    
+    aggregated_scores = db.session.query('range1', 'count').from_statement(sql_statement).params(city_code=city_code, year=year)
         
-    return jsonify([[a.score_range, a.student_count] for a in aggregated_scores])
+    return jsonify([[a.range1, a.count] for a in aggregated_scores])
 
 ##############################
 # States routes
 ##############################
 
 @app.route("/states/<state>/cities/search.json")
-def states_cities_search(state):
+def search_cities_in_state(state):
     term   = request.args.get('term', '')
-    cities = School.search_cities(state, term)
+    cities = City.search(state, term)
         
-    return jsonify({ 'cities': [{ 'id': c.city_id, 'value': c.city.title() } for c in cities] })
+    return jsonify({ 'cities': [{ 'id': c.id, 'value': c.name.title() } for c in cities] })
 
 ##############################
 # Root route
@@ -161,8 +186,8 @@ def states_cities_search(state):
 
 @app.route('/')
 def show_main_page():
-    enem_subjects = EnemSubject.query
-    states        = School.query.distinct(School.state).order_by(School.state)
-    years         = [2011, 2012]      # TODO: fetch from database.
+    enem_subjects = sorted([[k, v[1]] for k, v in ENEM_SUBJECTS_MAPPING.iteritems()], key=itemgetter(1))
+    states        = State.query
+    years         = EnemSubscription.years()
     
     return render_template('main_page.html', enem_subjects=enem_subjects, states=states, years=years)
