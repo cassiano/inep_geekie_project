@@ -50,7 +50,7 @@ class EnemSubscription(db.Model):
         
     @classmethod
     def years(cls):
-        return [es.year for es in cls.query.distinct(cls.year).order_by(cls.year)]
+        return cls.query.distinct(cls.year).order_by(cls.year)
 
 class School(db.Model):
     __tablename__ = 'dim_schools'
@@ -188,6 +188,6 @@ def search_cities_in_state(state):
 def show_main_page():
     enem_subjects = sorted([[k, v[1]] for k, v in ENEM_SUBJECTS_MAPPING.iteritems()], key=itemgetter(1))
     states        = State.query
-    years         = EnemSubscription.years()
+    years         = [es.year for es in EnemSubscription.years()]
     
     return render_template('main_page.html', enem_subjects=enem_subjects, states=states, years=years)
