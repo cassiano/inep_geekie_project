@@ -144,6 +144,30 @@ class State(db.Model):
     def __repr__(self):
         return "<State('%s')>" % self.state
 
+    @classmethod
+    def aggregated_scores(cls, state, year, enem_subject):
+        # TODO: write the SQL code below purely in Python, using the SQLAlchemy API.
+        sql_statement = """
+            select 
+                n.range1, 
+                count(*) as count 
+            from 
+                facts_enem_subscriptions f 
+            inner join 
+                dim_{0}_scores n on f.{0}_score_id = n.id 
+            inner join 
+                dim_schools s on f.school_id = s.id 
+            where 
+                s.state = :state and 
+                f.year = :year 
+            group by 
+                n.range1 
+            order by 
+                n.range1
+        """.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0])
+
+        return db.session.query('range1', 'count').from_statement(sql_statement).params(state=state.upper(), year=year)
+
 ##############################
 # Schools routes
 ##############################
@@ -175,6 +199,10 @@ def search_cities_in_state(state):
     term = request.args.get('term', '')
 
     return jsonify({ 'cities': [{ 'id': c.id, 'value': c.name.title() } for c in City.search(state, term)] })
+
+@app.route("/states/<state>/aggregated_scores/<year>/<enem_subject>.json")
+def aggregated_scores_by_state(state, year, enem_subject):
+    return jsonify([[a.range1, a.count] for a in State.aggregated_scores(state, year, enem_subject)])
 
 ##############################
 # Root route
