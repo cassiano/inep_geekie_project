@@ -26,14 +26,14 @@ $(function() {
     self.schoolName   = ko.observable();
 
     self.citySeriesData = ko.computed(function() {
-      if (self.cityId() == undefined || self.year() == undefined || self.enemSubject() == undefined) return;
+      if (!self.cityId() || !self.year() || !self.enemSubject()) return;
       
       return syncGetJSON('/cities/' + self.cityId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json');
     });
 
     self.chartOptions = {
       dataSource: ko.computed(function() {
-        if (self.schoolId() == undefined) return;   // Return immediatelly if no school selected.
+        if (!self.schoolId()) return;   // Return immediatelly if no school selected.
 
         var schoolSeriesData, dataSource = [], cityTotal = 0.0, schoolTotal = 0.0;
 
@@ -60,7 +60,7 @@ $(function() {
       }),
       
       series: ko.computed(function() {
-        if (self.schoolName() == undefined) return;   // Return immediatelly if no school selected.
+        if (!self.schoolName()) return;   // Return immediatelly if no school selected.
 
         return [
           { valueField: 'school', name: self.schoolName() },

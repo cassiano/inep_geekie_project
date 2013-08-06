@@ -20,13 +20,16 @@ $(function() {
       });
     },
     select: function(event, ui) {
-      // Update the view model with the selected city id and name.
-      viewModel.cityId(ui.item.id);
-      viewModel.cityName(ui.item.value);
-      
-      $('#school').val('');           // Reset the school (autocomplete) input text.
+      // Clear the school (autocomplete) input text.
+      $('#school').val('');
+
+      // Reset the view model's school (ID and name).
       viewModel.schoolId(null);
       viewModel.schoolName(null);
+
+      // Update the view model's city (ID and name).
+      viewModel.cityId(ui.item.id);
+      viewModel.cityName(ui.item.value);
     }
   });
 
