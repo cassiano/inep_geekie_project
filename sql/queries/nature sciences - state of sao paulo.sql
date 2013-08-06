@@ -7,7 +7,7 @@ inner join
 inner join 
   dim_schools s on f.school_id = s.id
 where 
-  s.state = 'SP'
+  s.state = 'SP' and f.year = 2011
 group by 
   n.range1
 order by 
