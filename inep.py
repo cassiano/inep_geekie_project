@@ -110,7 +110,7 @@ class City(db.Model):
 
     @classmethod
     def search(cls, state_context, term):
-        return cls.query.filter_by(state=state_context).filter(cls.name.contains(term.upper())).order_by(City.name)
+        return cls.query.filter_by(state=state_context.upper()).filter(cls.name.contains(term.upper())).order_by(City.name)
 
     @classmethod
     def aggregated_scores(cls, city_code, year, enem_subject):
