@@ -24,7 +24,26 @@ ENEM_SUBJECTS_MAPPING = {
     'LAN': ['languages_and_codes',  u'Linguagens e Códigos'],
     'MAT': ['math',                 u'Matemática']
 }
-
+# TODO: rewrite the SQL command below using the SQLAlchemy API.
+COUNT_BY_RANGE_SQL_STATEMENT = """
+    select 
+        n.range1, 
+        count(*) as count 
+    from 
+        facts_enem_subscriptions f 
+    inner join 
+        dim_{0}_scores n on f.{0}_score_id = n.id 
+    inner join 
+        dim_schools s on f.school_id = s.id 
+    where 
+        s.{1} = :{1} and 
+        f.year = :year 
+    group by 
+        n.range1 
+    order by 
+        n.range1
+"""
+        
 ##############################
 # SQLAlchemy domain models
 ##############################
@@ -74,25 +93,7 @@ class School(db.Model):
 
     @classmethod
     def aggregated_scores(cls, city_id, year, enem_subject):
-      # TODO: write the SQL code below purely in Python, using the SQLAlchemy API.
-      sql_statement = """
-          select 
-              n.range1, 
-              count(*) as count 
-          from 
-              facts_enem_subscriptions f 
-          inner join 
-              dim_{0}_scores n on f.{0}_score_id = n.id 
-          inner join 
-              dim_schools s on f.school_id = s.id 
-          where 
-              s.id = :id and 
-              f.year = :year 
-          group by 
-              n.range1 
-          order by 
-              n.range1
-      """.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0])
+      sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0], 'id')
 
       return db.session.query('range1', 'count').from_statement(sql_statement).params(id=city_id, year=year)
 
@@ -113,25 +114,7 @@ class City(db.Model):
 
     @classmethod
     def aggregated_scores(cls, city_code, year, enem_subject):
-        # TODO: write the SQL code below purely in Python, using the SQLAlchemy API.
-        sql_statement = """
-            select 
-                n.range1, 
-                count(*) as count 
-            from 
-                facts_enem_subscriptions f 
-            inner join 
-                dim_{0}_scores n on f.{0}_score_id = n.id 
-            inner join 
-                dim_schools s on f.school_id = s.id 
-            where 
-                s.city_code = :city_code and 
-                f.year = :year 
-            group by 
-                n.range1 
-            order by 
-                n.range1
-        """.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0])
+        sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0], 'city_code')
 
         return db.session.query('range1', 'count').from_statement(sql_statement).params(city_code=city_code, year=year)
 
@@ -146,25 +129,7 @@ class State(db.Model):
 
     @classmethod
     def aggregated_scores(cls, state, year, enem_subject):
-        # TODO: write the SQL code below purely in Python, using the SQLAlchemy API.
-        sql_statement = """
-            select 
-                n.range1, 
-                count(*) as count 
-            from 
-                facts_enem_subscriptions f 
-            inner join 
-                dim_{0}_scores n on f.{0}_score_id = n.id 
-            inner join 
-                dim_schools s on f.school_id = s.id 
-            where 
-                s.state = :state and 
-                f.year = :year 
-            group by 
-                n.range1 
-            order by 
-                n.range1
-        """.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0])
+        sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0], 'state')
 
         return db.session.query('range1', 'count').from_statement(sql_statement).params(state=state.upper(), year=year)
 
