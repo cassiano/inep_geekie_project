@@ -17,10 +17,10 @@ $(function() {
   function ViewModel() {
     self = this;
     
-		self.enemSubject  = ko.observable();
-		self.year         = ko.observable();
+    self.enemSubject  = ko.observable();
+    self.year         = ko.observable();
     self.state        = ko.observable();
-		self.cityId       = ko.observable();
+    self.cityId       = ko.observable();
     self.cityName     = ko.observable();
     self.schoolId     = ko.observable();
     self.schoolName   = ko.observable();
@@ -87,6 +87,6 @@ $(function() {
     }
   };
 
-  window.viewModel = new ViewModel();
-  ko.applyBindings(window.viewModel);
+  viewModel = new ViewModel();
+  ko.applyBindings(viewModel);
 });

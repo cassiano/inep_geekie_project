@@ -1,55 +1,59 @@
 {% extends 'layout.html' %}
 
 {% block scripts %}
-	<script type='text/javascript' src='http://code.jquery.com/ui/1.10.3/jquery-ui.js'></script>
-	<script type='text/javascript' src='http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js'></script>
-	<script type='text/javascript' src='http://ajax.aspnetcdn.com/ajax/globalize/0.1.1/globalize.min.js'></script>
-	<script type='text/javascript' src='http://cdn3.devexpress.com/jslib/13.1.5/js/dx.chartjs.js'></script>
+  <script type='text/javascript' src='http://code.jquery.com/ui/1.10.3/jquery-ui.js'></script>
+  <script type='text/javascript' src='http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js'></script>
+  <script type='text/javascript' src='http://ajax.aspnetcdn.com/ajax/globalize/0.1.1/globalize.min.js'></script>
+  <script type='text/javascript' src='http://cdn3.devexpress.com/jslib/13.1.5/js/dx.chartjs.js'></script>
 
-	<script type='text/javascript' src='{{ url_for('static', filename='javascripts/autocomplete.js') }}'></script>
-	<script type='text/javascript' src='{{ url_for('static', filename='javascripts/chart.js') }}'></script>
+  <script type='text/javascript' src='{{ url_for('static', filename='javascripts/autocomplete.js') }}'></script>
+  <script type='text/javascript' src='{{ url_for('static', filename='javascripts/chart.js') }}'></script>
 {% endblock %}
 
 {% block body %}
-	<h1>Comparador de performance de escolas no Enem</h1>
-	
-	<br />
-	<div class='ui-widget'>
+  <h1>Comparador de performance de escolas no Enem</h1>
+  
+  <br />
+  <div class='ui-widget'>
     <label for='enem_subject'>Disciplina: </label>
     <select id='enem_subject' data-bind='value: enemSubject'>
-  		{% for es in enem_subjects %}
-  			<option value='{{ es[0] }}'>{{ es[1] }}</value>
-  		{% endfor %}
-  	</select>
-	</div>
+      {% for es in enem_subjects %}
+        <option value='{{ es[0] }}'>{{ es[1] }}</value>
+      {% endfor %}
+    </select>
+  </div>
 
-	<div class='ui-widget'>
+  <div class='ui-widget'>
     <label for='year'>Ano: </label>
     <select id='year' data-bind='value: year'>
-  		{% for y in years %}
-  			<option value='{{ y }}'>{{ y }}</value>
-  		{% endfor %}
-  	</select>
-	</div>
+      {% for y in years %}
+        <option value='{{ y }}'>{{ y }}</value>
+      {% endfor %}
+    </select>
+  </div>
 
-	<div class='ui-widget'>
+  <div class='ui-widget'>
     <label for='state'>Estado: </label>
     <select id='state' data-bind='value: state'>
-  		{% for s in states %}
-  			<option value='{{ s.state }}'>{{ s.state }}</value>
-  		{% endfor %}
-  	</select>
-	</div>
+      <option value=''>Selecione</value>
+      {% for s in states %}
+        <option value='{{ s.state }}'>{{ s.state }}</value>
+      {% endfor %}
+    </select>
+  </div>
 
-	<div class='ui-widget'>
+  <div id='city-container' class='ui-widget' data-bind='visible: !!state()'>
     <label for='city'>Cidade: </label>
     <input id='city' size='40' placeholder='Selecione uma cidade' />
+  </div>
 
-	<div id='school-container' class='ui-widget' style='display: none;'>
-	  <label for='school'>Escola: </label>
-	  <input id='school' size='40' placeholder='Selecione uma escola' />
-	</div>
+  <div id='school-container' class='ui-widget' data-bind='visible: !!cityId()'>
+    <label for='school'>Escola: </label>
+    <input id='school' size='40' placeholder='Selecione uma escola' />
+  </div>
 
-	<br />
-	<div id='chartContainer' style='max-width:800px;height: 400px; display: none;' data-bind='dxChart: { chartOptions }'></div>
+  <br />
+  <div id='chart-container' data-bind='visible: !!schoolId()'>
+    <div id='chart' style='max-width: 800px; height: 400px;' data-bind='dxChart: { chartOptions }'></div>
+  </div>
 {% endblock %}
