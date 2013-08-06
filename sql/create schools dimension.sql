@@ -6,7 +6,7 @@ create table dim_schools as
     es.school_code as code, 
     coalesce(
       trim(s.name), 
-      '[ESCOLA DESCONHECIDA COM CODIGO ' || es.school_code || ' EM ' || trim(es.city) || '-' || es.state || ']'
+      '[ESCOLA ' || es.school_code || ' (' || trim(es.city) || '-' || es.state || ')'
     ) as name,
     es.city_code, 
     trim(es.city) as city, 
