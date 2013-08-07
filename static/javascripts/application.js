@@ -1,33 +1,64 @@
-var DEBUG = false;
+(function() {
+  var viewModel, DEBUG = false;
 
-function log(msg) {
-  if (DEBUG) {
-    var d = new Date();
-    console.log('[' + d + ' + ' + d.getMilliseconds() + ' ms] ' + msg + '...');
+  // ##########################
+  // Support functions
+  // ##########################
+
+  var log = function(msg) {
+    if (DEBUG) {
+      var d = new Date();
+      console.log('[' + d + ' + ' + d.getMilliseconds() + ' ms] ' + msg + '...');
+    }
   }
-}
 
-function syncGetJSON(url) {
-  var json;
+  var syncGetJSON = function(url) {
+    var json;
   
-  $.ajax({
-    type: 'GET',
-    url: url,
-    dataType: 'json',
-    success: function(data) { json = data; },
-    data: {},
-    async: false
-  });
+    $.ajax({
+      type: 'GET',
+      url: url,
+      dataType: 'json',
+      success: function(data) { json = data; },
+      data: {},
+      async: false
+    });
   
-  return json;
-}
+    return json;
+  }
 
-$(function() {
-  function ViewModel() {
+  var clearAutocompleteAndViewModelCityData = function() {
+    $('#city').val('');
+
+    updateViewModelCityData(null, null);
+    clearAutocompleteAndViewModelSchoolData();
+  }
+
+  var clearAutocompleteAndViewModelSchoolData = function() {
+    $('#school').val('');
+
+    updateViewModelSchoolData(null, null);
+  }
+
+  var updateViewModelCityData = function(id, name) {
+    viewModel.cityId(id);
+    viewModel.cityName(name);
+  }
+
+  var updateViewModelSchoolData = function(id, name) {
+    viewModel.schoolId(id);
+    viewModel.schoolName(name);
+  }
+
+  // ##########################
+  // View Model definition
+  // ##########################
+
+  var ViewModel = function() {
     jsonCache = { cities: {}, schools: {} }
-    
+  
     self = this;
-    
+  
     self.enemSubject  = ko.observable();
     self.year         = ko.observable();
     self.cityId       = ko.observable();
@@ -48,11 +79,11 @@ $(function() {
 
     self.citySeriesData = ko.computed(function() {
       log('citySeriesData being calculated');
-      
+    
       var json, cacheKey = [self.enemSubject(), self.year(), self.cityId()];
-      
+    
       if (!self.cityId()) { log('returning'); return; }
-      
+    
       if (cacheKey in jsonCache.cities) {
         json = jsonCache.cities[cacheKey];
       } else {
@@ -68,7 +99,7 @@ $(function() {
         log('dataSource being calculated...');
 
         var schoolSeriesData, dataSource = [], cityTotal = 0.0, schoolTotal = 0.0, cacheKey = [self.enemSubject(), self.year(), self.schoolId()];
-      
+    
         if (!self.schoolId()) { log('returning'); return; }
 
         if (cacheKey in jsonCache.schools) {
@@ -96,7 +127,7 @@ $(function() {
       }).extend({ throttle: 1 }),   // Use the "throttle" extender so changes to self.enemSubject() or self.year() don't 
                                     // cause this computed observable to be called twice (given it depends on these 2 
                                     // observables and self.citySeriesData(), which in turn also depends on them).
-      
+    
       series: ko.computed(function() {
         return [
           { valueField: 'school', name: self.schoolName() },
@@ -123,6 +154,66 @@ $(function() {
     }
   };
 
-  viewModel = new ViewModel();
-  ko.applyBindings(viewModel);
-});
+  $(function() {
+    // Initialize Knockout.
+    viewModel = new ViewModel();
+    ko.applyBindings(viewModel);
+
+    // ##########################
+    // Autocompletes
+    // ##########################
+
+    var autocompleteCache = { cities: {}, schools: {} };
+  
+    $('#city').autocomplete({
+      minLength: 3,
+      source: function(request, response) {
+        var term = request.term;
+        var state = viewModel.state();
+
+        if (term in (autocompleteCache.cities[state] || {})) {
+          response(autocompleteCache.cities[state][term]);
+          return;
+        }
+
+        $.getJSON('/states/' + state + '/cities/search.json', request, function(data, status, xhr) {
+          autocompleteCache.cities[state]       = autocompleteCache.cities[state] || {};
+          autocompleteCache.cities[state][term] = data.cities;
+
+          response(autocompleteCache.cities[state][term]);
+        });
+      },
+      select: function(event, ui) {
+        // Clear the school (autocomplete) input text and the view model's school (ID and name).
+        clearAutocompleteAndViewModelSchoolData();
+
+        // Update the view model's city (ID and name).
+        updateViewModelCityData(ui.item.id, ui.item.value);
+      }
+    });
+
+    $('#school').autocomplete({
+      minLength: 3,
+      source: function(request, response) {
+        var term   = request.term;
+        var cityId = viewModel.cityId();
+
+        if (term in (autocompleteCache.schools[cityId] || {})) {
+          response(autocompleteCache.schools[cityId][term]);
+          return;
+        }
+
+        $.getJSON('/schools/search/' + cityId + '.json', request, function(data, status, xhr) {
+          autocompleteCache.schools[cityId]       = autocompleteCache.schools[cityId] || {};
+          autocompleteCache.schools[cityId][term] = data.schools;
+
+          response(autocompleteCache.schools[cityId][term]);
+        });
+      },
+      select: function(event, ui) {
+        // Update the view model's school (id and name).
+        updateViewModelSchoolData(ui.item.id, ui.item.value);
+      }
+    });
+  });
+})();
