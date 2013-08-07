@@ -139,8 +139,8 @@
       for (var i = 0; i < 10; i++) {
         dataSource[i] = {
           scoreRange: i + '-' + (i + 1), 
-          school: schoolTotal > 0 ? (self.schoolSeriesData()[i] / schoolTotal || 0) * 100.0 : 0.0,
-          city:   cityTotal   > 0 ? (self.citySeriesData()[i]   / cityTotal   || 0) * 100.0 : 0.0
+          school: schoolTotal > 0 ? (self.schoolSeriesData()[i + 1] / schoolTotal || 0) * 100.0 : 0.0,
+          city:   cityTotal   > 0 ? (self.citySeriesData()  [i + 1] / cityTotal   || 0) * 100.0 : 0.0
         }
       }
 
