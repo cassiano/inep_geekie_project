@@ -13,7 +13,7 @@
   <h1>Comparador de performance de escolas no Enem</h1>
   
   <br />
-  <div class='ui-widget'>
+  <div id='enem-subject-container' class='ui-widget'>
     <label for='enem_subject'>Disciplina: </label>
     <select id='enem_subject' data-bind='value: enemSubject'>
       {% for es in enem_subjects %}
@@ -22,7 +22,7 @@
     </select>
   </div>
 
-  <div class='ui-widget'>
+  <div id='year-container'class='ui-widget'>
     <label for='year'>Ano: </label>
     <select id='year' data-bind='value: year'>
       {% for y in years %}
@@ -31,7 +31,7 @@
     </select>
   </div>
 
-  <div class='ui-widget'>
+  <div id='state-container' class='ui-widget'>
     <label for='state'>Estado: </label>
     <select id='state' data-bind='value: state'>
       <option value=''>Selecione</value>
