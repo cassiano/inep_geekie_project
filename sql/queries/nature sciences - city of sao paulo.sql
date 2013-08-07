@@ -7,7 +7,7 @@ inner join
 inner join 
   dim_schools s on f.school_id = s.id
 where 
-  s.city = 'SAO PAULO' and f.year = 2011
+  s.city_code = '3550308' and f.year = 2011
 group by 
   n.range1
 order by 
