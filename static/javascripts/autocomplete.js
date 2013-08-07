@@ -1,3 +1,20 @@
+function clearAutocompleteAndViewModelSchoolData() {
+  $('#school').val('');
+
+  viewModel.schoolId(null);
+  viewModel.schoolName(null);
+}
+
+function updateViewModelCityData(id, name) {
+  viewModel.cityId(id);
+  viewModel.cityName(name);
+}
+
+function updateViewModelSchoolData(id, name) {
+  viewModel.schoolId(id);
+  viewModel.schoolName(name);
+}
+
 $(function() {
   var cache = { cities: {}, schools: {} };
   
@@ -20,16 +37,11 @@ $(function() {
       });
     },
     select: function(event, ui) {
-      // Clear the school (autocomplete) input text.
-      $('#school').val('');
-
-      // Reset the view model's school (ID and name).
-      viewModel.schoolId(null);
-      viewModel.schoolName(null);
+      // Clear the school (autocomplete) input text and the view model's school (ID and name).
+      clearAutocompleteAndViewModelSchoolData();
 
       // Update the view model's city (ID and name).
-      viewModel.cityId(ui.item.id);
-      viewModel.cityName(ui.item.value);
+      updateViewModelCityData(ui.item.id, ui.item.value);
     }
   });
 
@@ -52,9 +64,8 @@ $(function() {
       });
     },
     select: function(event, ui) {
-      // Update the view model with the selected school id and name.
-      viewModel.schoolId(ui.item.id);
-      viewModel.schoolName(ui.item.value);
+      // Update the view model's school (id and name).
+      updateViewModelSchoolData(ui.item.id, ui.item.value);
     }
   });
 });
