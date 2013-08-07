@@ -71,8 +71,6 @@ $(function() {
         
         schoolSeriesData = json;
 
-        // Show the chart, since it will be hidden when the page first loads.
-        $('#chartContainer').show();
 
         // Calculate totals.
         $.each(schoolSeriesData,      function(index, value) { schoolTotal  += value })
