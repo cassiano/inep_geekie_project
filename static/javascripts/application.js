@@ -1,5 +1,5 @@
 (function() {
-  var viewModel, jsonCache = {}, DEBUG = false;
+  var viewModel, DEBUG = false;
 
   // ##########################
   // Support functions
@@ -37,14 +37,17 @@
     viewModel.schoolName(name);
   }
 
+  var jsonCache = {};
   var cachedGetJSON = function(url, params, callback) {
-    if (url in jsonCache) {
+    var cacheKey = '[' + url + '][' + JSON.stringify(params) + ']';
+    
+    if (cacheKey in jsonCache) {
       log('getting JSON from cache');
-      callback(jsonCache[url]);
+      callback(jsonCache[cacheKey]);
     } else {
       $.getJSON(url, params, function(data) {
         log('saving JSON in cache');
-        jsonCache[url] = data;
+        jsonCache[cacheKey] = data;
         callback(data);
       });
     }
@@ -198,7 +201,7 @@
         var term  = request.term;
         var state = viewModel.state();
 
-        cachedGetJSON('/states/' + state + '/cities/search.json?term=' + term, {}, function(data) { response(data.cities); });
+        cachedGetJSON('/states/' + state + '/cities/search.json', { term: term }, function(data) { response(data.cities); });
       },
       select: function(event, ui) {
         // Update the view model's city (ID and name).
@@ -217,7 +220,7 @@
         var term   = request.term;
         var cityId = viewModel.cityId();
 
-        cachedGetJSON('/cities/' + cityId + '/schools/search.json?term=' + term, {}, function(data) { response(data.schools); });
+        cachedGetJSON('/cities/' + cityId + '/schools/search.json', { term: term }, function(data) { response(data.schools); });
       },
       select: function(event, ui) {
         // Update the view model's school (id and name).
