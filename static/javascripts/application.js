@@ -27,6 +27,7 @@
     return json;
   }
 
+  // Clears the city (autocomplete) input text and the view model's city data (ID and name).
   var clearCity = function() {
     $('#city').val('');
 
@@ -34,6 +35,7 @@
     clearSchool();
   }
 
+  // Clears the school (autocomplete) input text and the view model's school data (ID and name).
   var clearSchool = function() {
     $('#school').val('');
 
@@ -67,7 +69,11 @@
     self.schoolName  = ko.observable();
     self.state       = ko.observable();
 
-    $('#state').change(function() { clearCity(); });    // Clear city when changing state (using jQuery).
+    // When changing state, clear city and move focus to it.
+    $('#state').change(function() { 
+      clearCity();
+      $('#city').focus();
+    });
 
     self.citySeriesData = ko.computed(function() {
       log('citySeriesData being calculated');
@@ -176,11 +182,13 @@
         });
       },
       select: function(event, ui) {
-        // Clear the school (autocomplete) input text and the view model's school (ID and name).
-        clearSchool();
-
         // Update the view model's city (ID and name).
         updateViewModelCity(ui.item.id, ui.item.value);
+
+        clearSchool();
+        
+        // Move focus to school.
+        $('#school').focus();
       }
     });
 
