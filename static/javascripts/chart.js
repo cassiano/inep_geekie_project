@@ -57,20 +57,17 @@ $(function() {
       dataSource: ko.computed(function() {
         log('dataSource being calculated...');
 
-        var schoolSeriesData, dataSource = [], cityTotal = 0.0, schoolTotal = 0.0, json, cacheKey = [self.enemSubject(), self.year(), self.schoolId()];
+        var schoolSeriesData, dataSource = [], cityTotal = 0.0, schoolTotal = 0.0, cacheKey = [self.enemSubject(), self.year(), self.schoolId()];
       
         if (!self.schoolId()) { log('returning'); return; }
 
         if (cacheKey in jsonCache.schools) {
-          json = jsonCache.schools[cacheKey];
+          schoolSeriesData = jsonCache.schools[cacheKey];
         } else {
           // Get the selected school data series.
-          json = syncGetJSON('/schools/' + self.schoolId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json');
-          jsonCache.schools[cacheKey] = json;
+          schoolSeriesData = syncGetJSON('/schools/' + self.schoolId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json');
+          jsonCache.schools[cacheKey] = schoolSeriesData;
         }
-        
-        schoolSeriesData = json;
-
 
         // Calculate totals.
         $.each(schoolSeriesData,      function(index, value) { schoolTotal  += value })
