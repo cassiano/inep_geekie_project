@@ -30,11 +30,21 @@ $(function() {
     
     self.enemSubject  = ko.observable();
     self.year         = ko.observable();
-    self.state        = ko.observable();
     self.cityId       = ko.observable();
     self.cityName     = ko.observable();
     self.schoolId     = ko.observable();
     self.schoolName   = ko.observable();
+
+    self.stateValue = ko.observable();
+    self.state      = ko.computed({
+      read: function() {
+        return self.stateValue();
+      },
+      write: function(value) {
+        clearAutocompleteAndViewModelCityData();
+        self.stateValue(value);
+      }
+    });
 
     self.citySeriesData = ko.computed(function() {
       log('citySeriesData being calculated');
