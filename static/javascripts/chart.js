@@ -1,3 +1,12 @@
+var DEBUG = false;
+
+function log(msg) {
+  if (DEBUG) {
+    var d = new Date();
+    console.log('[' + d + ' + ' + d.getMilliseconds() + ' ms] ' + msg + '...');
+  }
+}
+
 function syncGetJSON(url) {
   var json;
   
@@ -26,14 +35,18 @@ $(function() {
     self.schoolName   = ko.observable();
 
     self.citySeriesData = ko.computed(function() {
-      if (!self.cityId() || !self.year() || !self.enemSubject()) return;
+      log('citySeriesData being calculated');
+      
+      if (!self.enemSubject() || !self.year() || !self.cityId()) { log('returning'); return; }
       
       return syncGetJSON('/cities/' + self.cityId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json');
     });
 
     self.chartOptions = {
       dataSource: ko.computed(function() {
-        if (!self.schoolId()) return;   // Return immediatelly if no school selected.
+        log('dataSource being calculated...');
+
+        if (!self.enemSubject() || !self.year() || !self.schoolId()) { log('returning'); return; }
 
         var schoolSeriesData, dataSource = [], cityTotal = 0.0, schoolTotal = 0.0;
 
@@ -57,11 +70,9 @@ $(function() {
         }
 
         return dataSource;
-      }),
+      }).extend({ throttle: 1 }),
       
       series: ko.computed(function() {
-        if (!self.schoolName()) return;   // Return immediatelly if no school selected.
-
         return [
           { valueField: 'school', name: self.schoolName() },
           { valueField: 'city',   name: 'Média da cidade de ' + self.cityName() }
