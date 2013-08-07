@@ -88,7 +88,9 @@ $(function() {
         }
 
         return dataSource;
-      }).extend({ throttle: 1 }),
+      }).extend({ throttle: 1 }),   // Use the "throttle" extender so changes to self.enemSubject() or self.year() don't 
+                                    // cause this computed observable to be called twice (given it depends on these 2 
+                                    // observables and self.citySeriesData(), which in turn also depends on them).
       
       series: ko.computed(function() {
         return [
