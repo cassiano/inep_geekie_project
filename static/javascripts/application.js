@@ -165,8 +165,8 @@
     // ##########################
 
     self.chartOptions = {
-      dataSource: ko.computed(function() { return self.dataSource(); }),
-      series:     ko.computed(function() { return self.series(); }),
+      dataSource: ko.computed(self.dataSource),
+      series:     ko.computed(self.series),
       commonSeriesSettings: {
         argumentField: 'scoreRange',
         type: 'bar',
