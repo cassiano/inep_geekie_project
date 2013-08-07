@@ -39,11 +39,9 @@ $(function() {
     self.citySeriesData = ko.computed(function() {
       log('citySeriesData being calculated');
       
-      var json, cacheKey;
+      var json, cacheKey = [self.enemSubject(), self.year(), self.cityId()];
       
-      if (!self.enemSubject() || !self.year() || !self.cityId()) { log('returning'); return; }
-      
-      cacheKey = [self.enemSubject(), self.year(), self.cityId()];
+      if (!self.cityId()) { log('returning'); return; }
       
       if (cacheKey in jsonCache.cities) {
         json = jsonCache.cities[cacheKey];
@@ -59,14 +57,10 @@ $(function() {
       dataSource: ko.computed(function() {
         log('dataSource being calculated...');
 
-        var json, cacheKey;
-
-        if (!self.enemSubject() || !self.year() || !self.schoolId()) { log('returning'); return; }
-
-        var schoolSeriesData, dataSource = [], cityTotal = 0.0, schoolTotal = 0.0;
-
-        cacheKey = [self.enemSubject(), self.year(), self.schoolId()];
+        var schoolSeriesData, dataSource = [], cityTotal = 0.0, schoolTotal = 0.0, json, cacheKey = [self.enemSubject(), self.year(), self.schoolId()];
       
+        if (!self.schoolId()) { log('returning'); return; }
+
         if (cacheKey in jsonCache.schools) {
           json = jsonCache.schools[cacheKey];
         } else {
