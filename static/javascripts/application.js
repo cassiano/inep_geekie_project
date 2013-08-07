@@ -39,11 +39,11 @@
 
   var cachedGetJSON = function(url, params, callback) {
     if (url in jsonCache) {
-      log('Getting json from cache');
+      log('getting JSON from cache');
       callback(jsonCache[url]);
     } else {
       $.getJSON(url, params, function(data) {
-        log('saving json in cache');
+        log('saving JSON in cache');
         jsonCache[url] = data;
         callback(data);
       });
@@ -72,7 +72,7 @@
     });
 
     // ##########################
-    // School school series data
+    // Chart series data for school
     // ##########################
     
     self.schoolSeriesData          = ko.observable();
@@ -93,7 +93,7 @@
     });
 
     // ##########################
-    // Chart city series data
+    // Chart series data for city
     // ##########################
 
     self.citySeriesData          = ko.observable();
