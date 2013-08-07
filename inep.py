@@ -141,15 +141,15 @@ class State(db.Model):
 def aggregated_scores_by_school(id, year, enem_subject):
     return jsonify([[a.range1, a.count] for a in School.aggregated_scores(id, year, enem_subject)])
 
-@app.route("/schools/search/<city_code>.json")
+##############################
+# Cities routes
+##############################
+
+@app.route("/cities/<city_code>/schools/search.json")
 def search_schools_in_city(city_code):
     term = request.args.get('term', '')
         
     return jsonify({ 'schools': [{ 'id': s.id, 'value': s.name.title() } for s in School.search(city_code, term)] })
-
-##############################
-# Cities routes
-##############################
 
 @app.route("/cities/<city_code>/aggregated_scores/<year>/<enem_subject>.json")
 def aggregated_scores_by_city(city_code, year, enem_subject):
