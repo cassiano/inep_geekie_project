@@ -17,7 +17,6 @@
   <div class='ui-widget'>
     <label for='enem_subject'>Disciplina: </label>
     <select id='enem_subject' data-bind='value: enemSubject'>
-      <option value=''>Selecione</value>
       {% for es in enem_subjects %}
         <option value='{{ es[0] }}'>{{ es[1] }}</value>
       {% endfor %}
@@ -27,7 +26,6 @@
   <div class='ui-widget'>
     <label for='year'>Ano: </label>
     <select id='year' data-bind='value: year'>
-      <option value=''>Selecione</value>
       {% for y in years %}
         <option value='{{ y }}'>{{ y }}</value>
       {% endfor %}
@@ -49,13 +47,13 @@
     <input id='city' size='40' placeholder='Selecione uma cidade' />
   </div>
 
-  <div id='school-container' class='ui-widget' data-bind='visible: !!cityId()'>
+  <div id='school-container' class='ui-widget' data-bind='visible: !!state() && !!cityId()'>
     <label for='school'>Escola: </label>
     <input id='school' size='40' placeholder='Selecione uma escola' />
   </div>
 
   <br />
-  <div id='chart-container' data-bind='visible: !!schoolId()'>
+  <div id='chart-container' data-bind='visible: !!state() && !!cityId() && !!schoolId()'>
     <div id='chart' style='max-width: 800px; height: 400px;' data-bind='dxChart: { chartOptions }'></div>
   </div>
 {% endblock %}

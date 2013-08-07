@@ -24,6 +24,8 @@ function syncGetJSON(url) {
 
 $(function() {
   function ViewModel() {
+    jsonCache = { cities: {}, schools: {} }
+    
     self = this;
     
     self.enemSubject  = ko.observable();
@@ -37,22 +39,44 @@ $(function() {
     self.citySeriesData = ko.computed(function() {
       log('citySeriesData being calculated');
       
+      var json, cacheKey;
+      
       if (!self.enemSubject() || !self.year() || !self.cityId()) { log('returning'); return; }
       
-      return syncGetJSON('/cities/' + self.cityId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json');
+      cacheKey = [self.enemSubject(), self.year(), self.cityId()];
+      
+      if (cacheKey in jsonCache.cities) {
+        json = jsonCache.cities[cacheKey];
+      } else {
+        json = syncGetJSON('/cities/' + self.cityId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json');
+        jsonCache.cities[cacheKey] = json;
+      }
+
+      return json;
     });
 
     self.chartOptions = {
       dataSource: ko.computed(function() {
         log('dataSource being calculated...');
 
+        var json, cacheKey;
+
         if (!self.enemSubject() || !self.year() || !self.schoolId()) { log('returning'); return; }
 
         var schoolSeriesData, dataSource = [], cityTotal = 0.0, schoolTotal = 0.0;
 
-        // Get the selected school data series.
-        schoolSeriesData = syncGetJSON('/schools/' + self.schoolId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json');
+        cacheKey = [self.enemSubject(), self.year(), self.schoolId()];
       
+        if (cacheKey in jsonCache.schools) {
+          json = jsonCache.schools[cacheKey];
+        } else {
+          // Get the selected school data series.
+          json = syncGetJSON('/schools/' + self.schoolId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json');
+          jsonCache.schools[cacheKey] = json;
+        }
+        
+        schoolSeriesData = json;
+
         // Show the chart, since it will be hidden when the page first loads.
         $('#chartContainer').show();
 
