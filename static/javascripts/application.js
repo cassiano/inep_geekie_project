@@ -27,25 +27,25 @@
     return json;
   }
 
-  var clearAutocompleteAndViewModelCityData = function() {
+  var clearCity = function() {
     $('#city').val('');
 
-    updateViewModelCityData(null, null);
-    clearAutocompleteAndViewModelSchoolData();
+    updateViewModelCity(null, null);
+    clearSchool();
   }
 
-  var clearAutocompleteAndViewModelSchoolData = function() {
+  var clearSchool = function() {
     $('#school').val('');
 
-    updateViewModelSchoolData(null, null);
+    updateViewModelSchool(null, null);
   }
 
-  var updateViewModelCityData = function(id, name) {
+  var updateViewModelCity = function(id, name) {
     viewModel.cityId(id);
     viewModel.cityName(name);
   }
 
-  var updateViewModelSchoolData = function(id, name) {
+  var updateViewModelSchool = function(id, name) {
     viewModel.schoolId(id);
     viewModel.schoolName(name);
   }
@@ -59,23 +59,15 @@
   
     self = this;
   
-    self.enemSubject  = ko.observable();
-    self.year         = ko.observable();
-    self.cityId       = ko.observable();
-    self.cityName     = ko.observable();
-    self.schoolId     = ko.observable();
-    self.schoolName   = ko.observable();
+    self.enemSubject = ko.observable();
+    self.year        = ko.observable();
+    self.cityId      = ko.observable();
+    self.cityName    = ko.observable();
+    self.schoolId    = ko.observable();
+    self.schoolName  = ko.observable();
+    self.state       = ko.observable();
 
-    self.stateValue = ko.observable();
-    self.state      = ko.computed({
-      read: function() {
-        return self.stateValue();
-      },
-      write: function(value) {
-        clearAutocompleteAndViewModelCityData();
-        self.stateValue(value);
-      }
-    });
+    $('#state').change(function() { clearCity(); });    // Clear city when changing state (using jQuery).
 
     self.citySeriesData = ko.computed(function() {
       log('citySeriesData being calculated');
@@ -185,10 +177,10 @@
       },
       select: function(event, ui) {
         // Clear the school (autocomplete) input text and the view model's school (ID and name).
-        clearAutocompleteAndViewModelSchoolData();
+        clearSchool();
 
         // Update the view model's city (ID and name).
-        updateViewModelCityData(ui.item.id, ui.item.value);
+        updateViewModelCity(ui.item.id, ui.item.value);
       }
     });
 
@@ -212,7 +204,7 @@
       },
       select: function(event, ui) {
         // Update the view model's school (id and name).
-        updateViewModelSchoolData(ui.item.id, ui.item.value);
+        updateViewModelSchool(ui.item.id, ui.item.value);
       }
     });
   });
