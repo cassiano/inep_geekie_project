@@ -129,7 +129,7 @@
 				return; 
 			}
 
-			var dataSource = [], cityTotal = 0.0, schoolTotal = 0.0;
+			var dataSource = [], schoolTotal = 0.0, cityTotal = 0.0;
 
 			// Calculate totals.
 			$.each(self.schoolSeriesData(), function(index, value) { schoolTotal	+= value })
@@ -145,10 +145,10 @@
 			}
 
 			self.dataSource(dataSource);
-		}).extend({ throttle: 1 });		// Use the "throttle" extender so changes to self.enemSubject() or self.year() don't 
-																	// cause this computed observable to be called twice (given it depends on these 2 
-																	// observables plus self.schoolSeriesData() and self.citySeriesData(), which in 
-																	// turn also depend on them).
+		}).extend({ throttle: 100 });		// Use the "throttle" extender so changes to self.enemSubject() or self.year() don't 
+																	  // cause this computed observable to be called twice (given it depends on these 2 
+																	  // observables plus self.schoolSeriesData() and self.citySeriesData(), which in 
+																	  // turn also depend on them).
 
 		// ##########################
 		// Chart series
@@ -159,7 +159,7 @@
 				{ valueField: 'school', name: self.schoolName() },
 				{ valueField: 'city',		name: 'Média da cidade de ' + self.cityName() }
 			];
-		}),
+		});
 
 		// ##########################
 		// Chart options
@@ -182,7 +182,7 @@
 				verticalAlignment: 'bottom',
 				horizontalAlignment: 'center'
 			}			 
-		}
+		};
 	};
 
 	$(function() {
