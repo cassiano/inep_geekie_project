@@ -177,6 +177,6 @@ def aggregated_scores_by_state(state, year, enem_subject):
 def show_main_page():
 	enem_subjects = sorted([[k, v[1]] for k, v in ENEM_SUBJECTS_MAPPING.iteritems()], key=itemgetter(1))
 	states		  = State.query
-	years		  = [es.year for es in EnemSubscription.years()]
+	years		  = sorted([es.year for es in EnemSubscription.years()], reverse=True)
 	
 	return render_template('main_page.html', enem_subjects=enem_subjects, states=states, years=years)
