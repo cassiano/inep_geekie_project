@@ -17,7 +17,6 @@
     $('#city').val('');
 
     updateViewModelCity(null, null);
-    clearSchool();
   }
 
   // Clears the school (autocomplete) input text and the view model's school data (ID and name).
@@ -69,9 +68,15 @@
     self.state       = ko.observable();
 
     // When changing state, clear and move focus to city.
-    $('#state').change(function() { 
+    self.state.subscribe(function(value) { 
       clearCity();
       setTimeout(function() { $('#city').focus(); }, 200);
+    });
+
+    // When changing city, clear and move focus to school.
+    self.cityId.subscribe(function(value) { 
+      clearSchool();
+      setTimeout(function() { $('#school').focus(); }, 200);
     });
 
     // ##########################
@@ -208,10 +213,6 @@
       select: function(event, ui) {
         // Update the view model's city (ID and name).
         updateViewModelCity(ui.item.id, ui.item.value);
-
-        // Clear and move focus to school.
-        clearSchool();        
-        setTimeout(function() { $('#school').focus(); }, 200);
       }
     });
 
