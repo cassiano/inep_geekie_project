@@ -39,7 +39,7 @@
 
   var jsonCache = {};
   var cachedGetJSON = function(url, params, callback) {
-    var cacheKey = '[' + url + '][' + JSON.stringify(params) + ']';
+    var cacheKey = url + ', ' + JSON.stringify(params);
     
     if (cacheKey in jsonCache) {
       log('getting JSON from cache');
