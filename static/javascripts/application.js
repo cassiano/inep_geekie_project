@@ -1,231 +1,232 @@
 (function() {
-	var viewModel, DEBUG = false;
+  var viewModel, DEBUG = false;
 
-	// ##########################
-	// Support functions
-	// ##########################
+  // ##########################
+  // Support functions
+  // ##########################
 
-	var log = function(msg) {
-		if (DEBUG) {
-			var d = new Date();
-			console.log('[' + d + ' + ' + d.getMilliseconds() + ' ms] ' + msg + '...');
-		}
-	}
+  var log = function(msg) {
+    if (DEBUG) {
+      var d = new Date();
+      console.log('[' + d + ' + ' + d.getMilliseconds() + ' ms] ' + msg + '...');
+    }
+  }
 
-	// Clears the city (autocomplete) input text and the view model's city data (ID and name).
-	var clearCity = function() {
-		$('#city').val('');
+  // Clears the city (autocomplete) input text and the view model's city data (ID and name).
+  var clearCity = function() {
+    $('#city').val('');
 
-		updateViewModelCity(null, null);
-		clearSchool();
-	}
+    updateViewModelCity(null, null);
+    clearSchool();
+  }
 
-	// Clears the school (autocomplete) input text and the view model's school data (ID and name).
-	var clearSchool = function() {
-		$('#school').val('');
+  // Clears the school (autocomplete) input text and the view model's school data (ID and name).
+  var clearSchool = function() {
+    $('#school').val('');
 
-		updateViewModelSchool(null, null);
-	}
+    updateViewModelSchool(null, null);
+  }
 
-	var updateViewModelCity = function(id, name) {
-		viewModel.cityId(id);
-		viewModel.cityName(name);
-	}
+  var updateViewModelCity = function(id, name) {
+    viewModel.cityId(id);
+    viewModel.cityName(name);
+  }
 
-	var updateViewModelSchool = function(id, name) {
-		viewModel.schoolId(id);
-		viewModel.schoolName(name);
-	}
+  var updateViewModelSchool = function(id, name) {
+    viewModel.schoolId(id);
+    viewModel.schoolName(name);
+  }
 
-	var jsonCache = {};
-	var cachedGetJSON = function(url, params, callback) {
-		var cacheKey = '[' + url + '][' + JSON.stringify(params) + ']';
-		
-		if (cacheKey in jsonCache) {
-			log('getting JSON from cache');
-			callback(jsonCache[cacheKey]);
-		} else {
-			$.getJSON(url, params, function(data) {
-				log('saving JSON in cache');
-				jsonCache[cacheKey] = data;
-				callback(data);
-			});
-		}
-	}
+  var jsonCache = {};
+  var cachedGetJSON = function(url, params, callback) {
+    var cacheKey = '[' + url + '][' + JSON.stringify(params) + ']';
+    
+    if (cacheKey in jsonCache) {
+      log('getting JSON from cache');
+      callback(jsonCache[cacheKey]);
+    } else {
+      $.getJSON(url, params, function(data) {
+        log('saving JSON in cache');
+        jsonCache[cacheKey] = data;
+        callback(data);
+      });
+    }
+  }
 
-	// ##########################
-	// View Model definition
-	// ##########################
+  // ##########################
+  // View Model definition
+  // ##########################
 
-	var ViewModel = function() {
-		self = this;
-	
-		self.enemSubject = ko.observable();
-		self.year				 = ko.observable();
-		self.cityId			 = ko.observable();
-		self.cityName		 = ko.observable();
-		self.schoolId		 = ko.observable();
-		self.schoolName	 = ko.observable();
-		self.state			 = ko.observable();
+  var ViewModel = function() {
+    self = this;
+  
+    self.enemSubject = ko.observable();
+    self.year        = ko.observable();
+    self.cityId      = ko.observable();
+    self.cityName    = ko.observable();
+    self.schoolId    = ko.observable();
+    self.schoolName  = ko.observable();
+    self.state       = ko.observable();
 
-		// When changing state, clear and move focus to city.
-		$('#state').change(function() { 
-			clearCity();
-			setTimeout(function() { $('#city').focus(); }, 200);
-		});
+    // When changing state, clear and move focus to city.
+    $('#state').change(function() { 
+      clearCity();
+      setTimeout(function() { $('#city').focus(); }, 200);
+    });
 
-		// ##########################
-		// Chart series data for school
-		// ##########################
-		
-		self.schoolSeriesData					 = ko.observable();
-		self.schoolSeriesDataRefresher = ko.computed(function() {
-			log('schoolSeriesData being calculated');
-			
-			if (!self.schoolId()) { 
-				self.schoolSeriesData(null); 
-				log('returning'); 
-				return; 
-			}
-			
-			cachedGetJSON(
-				'/schools/' + self.schoolId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json', 
-				{}, 
-				self.schoolSeriesData
-			);
-		});
+    // ##########################
+    // Chart series data for school
+    // ##########################
+    
+    self.schoolSeriesData          = ko.observable();
+    self.schoolSeriesDataRefresher = ko.computed(function() {
+      log('schoolSeriesData being refreshed');
+      
+      // Reset the current series data.
+      self.schoolSeriesData(null); 
 
-		// ##########################
-		// Chart series data for city
-		// ##########################
+      // Return if no school selected.
+      if (!self.schoolId()) { log('returning'); return; }
+      
+      cachedGetJSON(
+        '/schools/' + self.schoolId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json', 
+        {}, 
+        self.schoolSeriesData
+      );
+    });
 
-		self.citySeriesData					 = ko.observable();
-		self.citySeriesDataRefresher = ko.computed(function() {
-			log('citySeriesData being calculated');
-			
-			if (!self.cityId()) { 
-				self.citySeriesData(null); 
-				log('returning'); 
-				return; 
-			}
+    // ##########################
+    // Chart series data for city
+    // ##########################
 
-			cachedGetJSON(
-				'/cities/' + self.cityId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json', 
-				{}, 
-				self.citySeriesData
-			);
-		});
+    self.citySeriesData          = ko.observable();
+    self.citySeriesDataRefresher = ko.computed(function() {
+      log('citySeriesData being refreshed');
 
-		// ##########################
-		// Chart data source
-		// ##########################
+      // Reset the current series data.
+      self.citySeriesData(null); 
 
-		self.dataSource					 = ko.observable();
-		self.dataSourceRefresher = ko.computed(function() {
-			log('dataSource being calculated...');
+      // Return if no city selected.
+      if (!self.cityId()) { log('returning'); return; }
 
-			if (!self.schoolSeriesData() || !self.citySeriesData()) { 
-				log('returning'); 
-				return; 
-			}
+      cachedGetJSON(
+        '/cities/' + self.cityId() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json', 
+        {}, 
+        self.citySeriesData
+      );
+    });
 
-			var dataSource = [], schoolTotal = 0.0, cityTotal = 0.0;
+    // ##########################
+    // Chart data source
+    // ##########################
 
-			// Calculate totals.
-			$.each(self.schoolSeriesData(), function(index, value) { schoolTotal	+= value })
-			$.each(self.citySeriesData(),		function(index, value) { cityTotal		+= value })
+    self.dataSource          = ko.observable();
+    self.dataSourceRefresher = ko.computed(function() {
+      log('dataSource being calculated');
+      
+      // Reset the current data source.
+      self.dataSource(null);
 
-			// Format the data source.
-			for (var i = 0; i < 10; i++) {
-				dataSource[i] = {
-					scoreRange: i + '-' + (i + 1), 
-					school: schoolTotal > 0 ? (self.schoolSeriesData()[i + 1] / schoolTotal || 0) * 100.0 : 0.0,
-					city:		cityTotal		> 0 ? (self.citySeriesData()	[i + 1] / cityTotal		|| 0) * 100.0 : 0.0
-				}
-			}
+      // Return if either school or city series data is not available.
+      if (!self.schoolSeriesData() || !self.citySeriesData()) { log('returning'); return; }
 
-			self.dataSource(dataSource);
-		}).extend({ throttle: 100 });		// Use the "throttle" extender so changes to self.enemSubject() or self.year() don't 
-																	  // cause this computed observable to be called twice (given it depends on these 2 
-																	  // observables plus self.schoolSeriesData() and self.citySeriesData(), which in 
-																	  // turn also depend on them).
+      // Calculate totals.
+      var schoolTotal = 0.0, cityTotal = 0.0;
+      $.each(self.schoolSeriesData(), function(index, value) { schoolTotal  += value })
+      $.each(self.citySeriesData(),   function(index, value) { cityTotal    += value })
 
-		// ##########################
-		// Chart series
-		// ##########################
+      // Format the data source.
+      var dataSource = [];
+      for (var i = 0; i < 10; i++) {
+        dataSource[i] = {
+          scoreRange: i + '-' + (i + 1), 
+          school: schoolTotal > 0 ? (self.schoolSeriesData()[i + 1] / schoolTotal || 0) * 100.0 : 0.0,
+          city:   cityTotal   > 0 ? (self.citySeriesData()  [i + 1] / cityTotal   || 0) * 100.0 : 0.0
+        }
+      }
 
-		self.series = ko.computed(function() {
-			return [
-				{ valueField: 'school', name: self.schoolName() },
-				{ valueField: 'city',		name: 'Média da cidade de ' + self.cityName() }
-			];
-		});
+      self.dataSource(dataSource);
+    }).extend({ throttle: 100 });   // Use the "throttle" extender so changes to self.enemSubject() or self.year() don't 
+                                    // cause this computed observable to be called twice (given it depends on these 2 
+                                    // observables plus self.schoolSeriesData() and self.citySeriesData(), which in 
+                                    // turn also depend on them).
 
-		// ##########################
-		// Chart options
-		// ##########################
+    // ##########################
+    // Chart series
+    // ##########################
 
-		self.chartOptions = {
-			dataSource: ko.computed(self.dataSource),
-			series:			ko.computed(self.series),
-			commonSeriesSettings: {
-				argumentField: 'scoreRange',
-				type: 'bar',
-				label:{
-					visible: true,
-					format: "fixedPoint",
-					precision: 1
-				}
-			},
-			title: { text: 'Histograma de comparação' },		
-			legend: {
-				verticalAlignment: 'bottom',
-				horizontalAlignment: 'center'
-			}			 
-		};
-	};
+    self.series = ko.computed(function() {
+      return [
+        { valueField: 'school', name: self.schoolName() },
+        { valueField: 'city',   name: 'Média da cidade de ' + self.cityName() }
+      ];
+    });
 
-	$(function() {
-		// Initialize Knockout.
-		viewModel = new ViewModel();
-		ko.applyBindings(viewModel);
+    // ##########################
+    // Chart options
+    // ##########################
 
-		// ##########################
-		// Autocompletes
-		// ##########################
+    self.chartOptions = {
+      dataSource: ko.computed(self.dataSource),
+      series:     ko.computed(self.series),
+      commonSeriesSettings: {
+        argumentField: 'scoreRange',
+        type: 'bar',
+        label:{
+          visible: true,
+          format: "fixedPoint",
+          precision: 1
+        }
+      },
+      title: { text: 'Histograma de comparação' },    
+      legend: {
+        verticalAlignment: 'bottom',
+        horizontalAlignment: 'center'
+      }      
+    };
+  };
 
-		var autocompleteCache = { cities: {}, schools: {} };
-	
-		$('#city').autocomplete({
-			minLength: 3,
-			source: function(request, response) {
-				var term	= request.term;
-				var state = viewModel.state();
+  $(function() {
+    // Initialize Knockout.
+    viewModel = new ViewModel();
+    ko.applyBindings(viewModel);
 
-				cachedGetJSON('/states/' + state + '/cities/search.json', { term: term }, function(data) { response(data.cities); });
-			},
-			select: function(event, ui) {
-				// Update the view model's city (ID and name).
-				updateViewModelCity(ui.item.id, ui.item.value);
+    // ##########################
+    // Autocompletes
+    // ##########################
 
-				// Clear and move focus to school.
-				clearSchool();				
-				setTimeout(function() { $('#school').focus(); }, 200);
-			}
-		});
+    var autocompleteCache = { cities: {}, schools: {} };
+  
+    $('#city').autocomplete({
+      minLength: 3,
+      source: function(request, response) {
+        var term  = request.term;
+        var state = viewModel.state();
 
-		$('#school').autocomplete({
-			minLength: 3,
-			source: function(request, response) {
-				var term	 = request.term;
-				var cityId = viewModel.cityId();
+        cachedGetJSON('/states/' + state + '/cities/search.json', { term: term }, function(data) { response(data.cities); });
+      },
+      select: function(event, ui) {
+        // Update the view model's city (ID and name).
+        updateViewModelCity(ui.item.id, ui.item.value);
 
-				cachedGetJSON('/cities/' + cityId + '/schools/search.json', { term: term }, function(data) { response(data.schools); });
-			},
-			select: function(event, ui) {
-				// Update the view model's school (id and name).
-				updateViewModelSchool(ui.item.id, ui.item.value);
-			}
-		});
-	});
+        // Clear and move focus to school.
+        clearSchool();        
+        setTimeout(function() { $('#school').focus(); }, 200);
+      }
+    });
+
+    $('#school').autocomplete({
+      minLength: 3,
+      source: function(request, response) {
+        var term   = request.term;
+        var cityId = viewModel.cityId();
+
+        cachedGetJSON('/cities/' + cityId + '/schools/search.json', { term: term }, function(data) { response(data.schools); });
+      },
+      select: function(event, ui) {
+        // Update the view model's school (id and name).
+        updateViewModelSchool(ui.item.id, ui.item.value);
+      }
+    });
+  });
 })();
