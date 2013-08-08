@@ -174,7 +174,7 @@
 				label:{
 					visible: true,
 					format: "fixedPoint",
-					precision: 0
+					precision: 1
 				}
 			},
 			title: { text: 'Histograma de comparação' },		
