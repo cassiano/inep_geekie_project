@@ -6,7 +6,7 @@
   // ##################################
 
   var log = function(msg) {
-    if (DEBUG) {
+    if (DEBUG && console) {
       var d = new Date();
       console.log('[' + d + ' + ' + d.getMilliseconds() + ' ms] ' + msg + '...');
     }
