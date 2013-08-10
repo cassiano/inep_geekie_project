@@ -119,7 +119,7 @@
 
       // Return if no city selected.
       if (!self.autocomplete.city.id()) { 
-        log('No city selected. returning'); 
+        log('No city selected. Returning'); 
         self.chart.data.series.city(undefined);   // Reset city series data.
         return; 
       }
@@ -137,7 +137,7 @@
     
       // Return if either school or city series data is unavailable.
       if (!self.chart.data.series.school() || !self.chart.data.series.city()) { 
-        log('Either school or city series data is unavailable. returning'); 
+        log('Either school or city series data is unavailable. Returning'); 
         self.chart.data.source(undefined);    // Reset data source.
         return; 
       }
