@@ -61,6 +61,8 @@
       },
 
       series: ko.computed(function() {
+        log('Series being updated');
+
         return [
           { valueField: 'school', name: self.autocomplete.school.name() },
           { valueField: 'city',   name: 'Média da cidade de ' + self.autocomplete.city.name() }
@@ -133,7 +135,7 @@
 
     // chart.data.source
     ko.computed(function() {
-      log('Data source being calculated');
+      log('Data source being updated');
     
       // Return if either school or city series data is unavailable.
       if (!self.chart.data.series.school() || !self.chart.data.series.city()) { 
