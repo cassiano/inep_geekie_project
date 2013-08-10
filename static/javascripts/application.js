@@ -179,6 +179,10 @@
       setTimeout(function() { $('#school').focus(); }, 200);
     });
 
+    // ##################################
+    // Helper functions
+    // ##################################
+
     self.helpers = {
       resetCity: function() {
         $('#city').val('');
@@ -242,5 +246,9 @@
         viewModel.helpers.autocomplete.updateSchool(ui.item.id, ui.item.value);
       }
     });
+    
+    // Reset viewModel's autocomplete data on changes to the input textboxes not handled by the Jquery UI autocomplete component.
+    $('#city'   ).change(function() { viewModel.helpers.resetCity(); })
+    $('#school' ).change(function() { viewModel.helpers.resetSchool(); })
   });
 })();
