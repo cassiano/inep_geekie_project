@@ -150,8 +150,8 @@
 
       // Calculate totals.
       var totals = { school: 0.0, city: 0.0 };
-      $.each(self.chart.data.series.school(), function(index, value) { totals.school  += value })
-      $.each(self.chart.data.series.city(),   function(index, value) { totals.city    += value })
+      $.each(self.chart.data.series.school(), function() { totals.school  += this; })
+      $.each(self.chart.data.series.city(),   function() { totals.city    += this; })
 
       // Format the data source.
       var dataSource = [];
