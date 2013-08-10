@@ -158,7 +158,7 @@
       }
 
       self.chart.data.source(dataSource);
-    }).extend({ throttle: 100 });   // Use the "throttle" extender so changes to self.enemSubject() or self.year() don't 
+    }).extend({ throttle: 500 });   // Use the "throttle" extender so changes to self.enemSubject() or self.year() don't 
                                     // cause this computed observable to be called twice (given it depends on these 2 
                                     // observables plus self.chart.data.series.school() and self.chart.data.series.city(),
                                     //  which in turn also depend on them).
