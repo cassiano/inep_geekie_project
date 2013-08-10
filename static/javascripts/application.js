@@ -17,11 +17,11 @@
     var cacheKey = url + ', ' + JSON.stringify(params);
     
     if (cacheKey in jsonCache) {
-      log('getting JSON from cache');
+      log('Getting JSON from cache');
       callback(jsonCache[cacheKey]);
     } else {
       $.getJSON(url, params, function(data) {
-        log('saving JSON in cache');
+        log('Saving JSON in cache');
         jsonCache[cacheKey] = data;
         callback(data);
       });
@@ -97,11 +97,11 @@
 
     // chart.data.series.school
     ko.computed(function() {
-      log('chart.data.series.school being refreshed');
+      log('Observable chart.data.series.school being refreshed');
     
       // Return if no school selected.
       if (!self.autocomplete.school.id()) { 
-        log('returning'); 
+        log('No school selected. Returning'); 
         self.chart.data.series.school(undefined);   // Reset school series data.
         return; 
       }
@@ -109,17 +109,17 @@
       cachedGetJSON(
         '/schools/' + self.autocomplete.school.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json', 
         {}, 
-        self.chart.data.series.school
+        self.chart.data.series.school   // Update the observable when the Ajax call has completed.
       );
     });
 
     // chart.data.series.city
     ko.computed(function() {
-      log('chart.data.series.city being refreshed');
+      log('Observable chart.data.series.city being refreshed');
 
       // Return if no city selected.
       if (!self.autocomplete.city.id()) { 
-        log('returning'); 
+        log('No city selected. returning'); 
         self.chart.data.series.city(undefined);   // Reset city series data.
         return; 
       }
@@ -127,33 +127,33 @@
       cachedGetJSON(
         '/cities/' + self.autocomplete.city.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json', 
         {}, 
-        self.chart.data.series.city
+        self.chart.data.series.city   // Update the observable when the Ajax call has completed.
       );
     });
 
     // chart.data.source
     ko.computed(function() {
-      log('dataSource being calculated');
+      log('Observable chart.data.source being calculated');
     
       // Return if either school or city series data is unavailable.
       if (!self.chart.data.series.school() || !self.chart.data.series.city()) { 
-        log('returning'); 
+        log('Either school or city series data is unavailable. returning'); 
         self.chart.data.source(undefined);    // Reset data source.
         return; 
       }
 
       // Calculate totals.
-      var schoolTotal = 0.0, cityTotal = 0.0;
-      $.each(self.chart.data.series.school(), function(index, value) { schoolTotal  += value })
-      $.each(self.chart.data.series.city(),   function(index, value) { cityTotal    += value })
+      var totals = { school: 0.0, city: 0.0 };
+      $.each(self.chart.data.series.school(), function(index, value) { totals.school  += value })
+      $.each(self.chart.data.series.city(),   function(index, value) { totals.city    += value })
 
       // Format the data source.
       var dataSource = [];
       for (var i = 0; i < 10; i++) {
         dataSource[i] = {
           scoreRange: i + '-' + (i + 1), 
-          school: schoolTotal > 0 ? (self.chart.data.series.school()[i + 1] / schoolTotal || 0) * 100.0 : 0.0,
-          city:   cityTotal   > 0 ? (self.chart.data.series.city()  [i + 1] / cityTotal   || 0) * 100.0 : 0.0
+          school: totals.school > 0 ? (self.chart.data.series.school()[i + 1] / totals.school || 0) * 100.0 : 0.0,
+          city:   totals.city   > 0 ? (self.chart.data.series.city()  [i + 1] / totals.city   || 0) * 100.0 : 0.0
         }
       }
 
