@@ -97,14 +97,16 @@
     // Chart data refreshers
     // ##################################
 
-    // chart.data.series.school
+    // chart.data.series.school updater.
     ko.computed(function() {
       log('School data series being refreshed');
     
+      // Reset school series data.
+      self.chart.data.series.school(undefined);
+
       // Return if no school selected.
       if (!self.autocomplete.school.id()) { 
         log('No school selected. Returning'); 
-        self.chart.data.series.school(undefined);   // Reset school series data.
         return; 
       }
     
@@ -115,14 +117,16 @@
       );
     });
 
-    // chart.data.series.city
+    // chart.data.series.city updater.
     ko.computed(function() {
       log('City data series being refreshed');
+
+      // Reset city series data.
+      self.chart.data.series.city(undefined);
 
       // Return if no city selected.
       if (!self.autocomplete.city.id()) { 
         log('No city selected. Returning'); 
-        self.chart.data.series.city(undefined);   // Reset city series data.
         return; 
       }
 
@@ -133,7 +137,7 @@
       );
     });
 
-    // chart.data.source
+    // chart.data.source updater.
     ko.computed(function() {
       log('Data source being updated');
     
@@ -154,16 +158,13 @@
       for (var i = 0; i < 10; i++) {
         dataSource[i] = {
           scoreRange: i + '-' + (i + 1), 
-          school: totals.school > 0 ? (self.chart.data.series.school()[i + 1] / totals.school || 0) * 100.0 : 0.0,
-          city:   totals.city   > 0 ? (self.chart.data.series.city()  [i + 1] / totals.city   || 0) * 100.0 : 0.0
+          school: totals.school > 0 ? ((self.chart.data.series.school()[i + 1] || 0) / totals.school) * 100.0 : 0.0,
+          city:   totals.city   > 0 ? ((self.chart.data.series.city()  [i + 1] || 0) / totals.city)   * 100.0 : 0.0
         }
       }
 
       self.chart.data.source(dataSource);
-    }).extend({ throttle: 500 });   // Use the "throttle" extender so changes to self.enemSubject() or self.year() don't 
-                                    // cause this computed observable to be called twice (given it depends on these 2 
-                                    // observables plus self.chart.data.series.school() and self.chart.data.series.city(),
-                                    //  which in turn also depend on them).
+    });
 
     // ##################################
     // Manual subscriptions
