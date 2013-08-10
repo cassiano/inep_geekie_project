@@ -97,7 +97,7 @@
 
     // chart.data.series.school
     ko.computed(function() {
-      log('Observable chart.data.series.school being refreshed');
+      log('School data series being refreshed');
     
       // Return if no school selected.
       if (!self.autocomplete.school.id()) { 
@@ -115,7 +115,7 @@
 
     // chart.data.series.city
     ko.computed(function() {
-      log('Observable chart.data.series.city being refreshed');
+      log('City data series being refreshed');
 
       // Return if no city selected.
       if (!self.autocomplete.city.id()) { 
@@ -133,7 +133,7 @@
 
     // chart.data.source
     ko.computed(function() {
-      log('Observable chart.data.source being calculated');
+      log('Data source being calculated');
     
       // Return if either school or city series data is unavailable.
       if (!self.chart.data.series.school() || !self.chart.data.series.city()) { 
