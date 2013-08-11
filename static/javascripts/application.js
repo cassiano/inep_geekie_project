@@ -226,6 +226,7 @@
 
     $('#city').autocomplete({
       minLength: 3,
+      autoFocus: true,
       source: function(request, response) {
         cachedGetJSON(
           '/states/' + viewModel.state() + '/cities/search.json', 
@@ -235,11 +236,16 @@
       },
       select: function(event, ui) {
         viewModel.helpers.autocomplete.updateCity(ui.item.id, ui.item.value);
+      },
+      change: function(event, ui) {
+        // Reset viewModel's autocomplete data on invalid changes.
+        if (ui.item == null) { viewModel.helpers.autocomplete.updateCity(undefined, undefined); }
       }
     });
 
     $('#school').autocomplete({
       minLength: 3,
+      autoFocus: true,
       source: function(request, response) {
         cachedGetJSON(
           '/cities/' + viewModel.autocomplete.city.id() + '/schools/search.json', 
@@ -249,11 +255,11 @@
       },
       select: function(event, ui) {
         viewModel.helpers.autocomplete.updateSchool(ui.item.id, ui.item.value);
+      },
+      change: function(event, ui) {
+        // Reset viewModel's autocomplete data on invalid changes.
+        if (ui.item == null) { viewModel.helpers.autocomplete.updateSchool(undefined, undefined); }
       }
     });
-    
-    // Reset viewModel's autocomplete data on changes to the input textboxes not handled by the Jquery UI autocomplete component.
-    $('#city'   ).change(function() { viewModel.helpers.resetCity(); })
-    $('#school' ).change(function() { viewModel.helpers.resetSchool(); })
   });
 })();
