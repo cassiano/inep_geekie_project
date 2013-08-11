@@ -20,6 +20,8 @@
       log('Getting JSON from cache');
       callback(jsonCache[cacheKey]);
     } else {
+      log('Doing Ajax request for URL ' + url + ' with parameters ' + JSON.stringify(params))
+      
       $.getJSON(url, params, function(data) {
         log('Saving JSON in cache');
         jsonCache[cacheKey] = data;
