@@ -7,14 +7,21 @@
 
   ko.bindingHandlers.fadeVisible = {
     init: function(element, valueAccessor) {
+      var display = ko.unwrap(valueAccessor()); 
+
       // Start visible/invisible according to initial value.
-      var shouldDisplay = ko.unwrap(valueAccessor()); 
-      $(element).toggle(shouldDisplay);
+      $(element).toggle(display);
     },
-    update: function(element, valueAccessor) {
+    update: function(element, valueAccessor, allBindingsAccessor) {
+      var display = ko.unwrap(valueAccessor()), allBindings = allBindingsAccessor();
+
+      // Grab some more data from another binding property.
+      var duration = allBindings.duration || 400;   // 400 ms is default duration unless otherwise specified
+
       // On update, fade in/out.
-      var shouldDisplay = ko.unwrap(valueAccessor()); 
-      shouldDisplay ? $(element).fadeIn() : $(element).fadeOut();
+      display ? $(element).fadeIn(duration) : $(element).fadeOut(duration);
+    } 
+  };
     } 
   };
 

@@ -41,18 +41,18 @@
     </select>
   </div>
 
-  <div id='city-container' class='ui-widget' data-bind='fadeVisible: state'>
+  <div id='city-container' class='ui-widget' data-bind='fadeVisible: state, duration: 1000'>
     <label for='city'>Cidade: </label>
     <input id='city' size='40' placeholder='Digite o nome de uma cidade' />
   </div>
 
-  <div id='school-container' class='ui-widget' data-bind='fadeVisible: autocomplete.city.id'>
+  <div id='school-container' class='ui-widget' data-bind='fadeVisible: autocomplete.city.id, duration: 1000'>
     <label for='school'>Escola: </label>
     <input id='school' size='40' placeholder='Digite o nome de uma escola' />
   </div>
 
   <br />
-  <div id='chart-container' data-bind='fadeVisible: autocomplete.school.id'>
+  <div id='chart-container' data-bind='fadeVisible: autocomplete.school.id, duration: 1000'>
     <div id='chart' style='max-width: 800px; height: 400px;' data-bind='dxChart: { chart.options }'></div>
   </div>
 {% endblock %}
