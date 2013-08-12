@@ -68,7 +68,16 @@
   }
 
   var jsonCache = {};
-  var cachedGetJSON = function(url, params, callback) {
+  var cachedGetJSON = function() {
+    var url = arguments[0], params = {}, callback;
+    
+    if (arguments.length == 2 && typeof arguments[1] == 'function') {
+      callback = arguments[1];
+    } else if (arguments.length == 3 && typeof arguments[1] == 'object' && typeof arguments[2] == 'function') {
+      params   = arguments[1];
+      callback = arguments[2];
+    }
+    
     var cacheKey = url + ', ' + JSON.stringify(params);
     
     if (cacheKey in jsonCache) {
@@ -169,7 +178,6 @@
     
       cachedGetJSON(
         '/schools/' + self.autocomplete.school.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json', 
-        {}, 
         self.chart.data.series.school   // Update the observable when the Ajax call has completed.
       );
     });
@@ -189,7 +197,6 @@
 
       cachedGetJSON(
         '/cities/' + self.autocomplete.city.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json', 
-        {}, 
         self.chart.data.series.city   // Update the observable when the Ajax call has completed.
       );
     });
