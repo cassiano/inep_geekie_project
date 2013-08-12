@@ -22,6 +22,33 @@
       display ? $(element).fadeIn(duration) : $(element).fadeOut(duration);
     } 
   };
+
+  ko.bindingHandlers.autocomplete = {
+    init: function(element, valueAccessor) {
+      var options = ko.unwrap(valueAccessor());
+
+      $(element).autocomplete({
+        minLength: options.minLength || 3,
+        autoFocus: options.autoFocus != undefined ? options.autoFocus : false,
+        select: function(event, ui) {
+          options.updateCallback(ui.item.id, ui.item.value);
+        },
+        change: function(event, ui) {
+          // Reset viewModel's autocomplete data on invalid changes.
+          if (ui.item == null) options.updateCallback(undefined, undefined);
+        }
+      });
+    },
+    update: function(element, valueAccessor) {
+      var options = ko.unwrap(valueAccessor());
+      
+      $(element).autocomplete('option', 'source', function(request, response) {
+        cachedGetJSON(
+          options.url, 
+          { term: request.term }, 
+          function(data) { response(data[options.jsonKey]); }
+        );
+      });
     } 
   };
 
@@ -243,47 +270,5 @@
     // Initialize Knockout.
     var viewModel = new ViewModel();
     ko.applyBindings(viewModel);
-
-    // ##################################
-    // Autocompletes
-    // ##################################
-
-    $('#city').autocomplete({
-      minLength: 3,
-      autoFocus: true,
-      source: function(request, response) {
-        cachedGetJSON(
-          '/states/' + viewModel.state() + '/cities/search.json', 
-          { term: request.term }, 
-          function(data) { response(data.cities); }
-        );
-      },
-      select: function(event, ui) {
-        viewModel.helpers.autocomplete.updateCity(ui.item.id, ui.item.value);
-      },
-      change: function(event, ui) {
-        // Reset viewModel's autocomplete data on invalid changes.
-        if (ui.item == null) { viewModel.helpers.autocomplete.updateCity(undefined, undefined); }
-      }
-    });
-
-    $('#school').autocomplete({
-      minLength: 3,
-      autoFocus: true,
-      source: function(request, response) {
-        cachedGetJSON(
-          '/cities/' + viewModel.autocomplete.city.id() + '/schools/search.json', 
-          { term: request.term }, 
-          function(data) { response(data.schools); }
-        );
-      },
-      select: function(event, ui) {
-        viewModel.helpers.autocomplete.updateSchool(ui.item.id, ui.item.value);
-      },
-      change: function(event, ui) {
-        // Reset viewModel's autocomplete data on invalid changes.
-        if (ui.item == null) { viewModel.helpers.autocomplete.updateSchool(undefined, undefined); }
-      }
-    });
   });
 })();
