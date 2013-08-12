@@ -88,8 +88,8 @@ class School(db.Model):
         return "<School('%s')>" % self.name
 
     @classmethod
-    def search(cls, city_code_context, term):
-        return cls.query.filter_by(city_code=city_code_context).filter(cls.name.contains(term.upper())).order_by(School.name)
+    def search_in_city(cls, city_code, term):
+        return cls.query.filter_by(city_code=city_code).filter(cls.name.contains(term.upper())).order_by(School.name)
 
     @classmethod
     def aggregated_scores(cls, city_id, year, enem_subject):
@@ -109,8 +109,8 @@ class City(db.Model):
         return "<City('%s')>" % self.name
 
     @classmethod
-    def search(cls, state_context, term):
-        return cls.query.filter_by(state=state_context.upper()).filter(cls.name.contains(term.upper())).order_by(City.name)
+    def search_in_state(cls, state, term):
+        return cls.query.filter_by(state=state.upper()).filter(cls.name.contains(term.upper())).order_by(City.name)
 
     @classmethod
     def aggregated_scores(cls, city_code, year, enem_subject):
@@ -149,7 +149,7 @@ def aggregated_scores_by_school(id, year, enem_subject):
 def search_schools_in_city(city_code):
     term = request.args.get('term', '')
         
-    return jsonify({ 'schools': [{ 'id': s.id, 'value': s.name.title() } for s in School.search(city_code, term)] })
+    return jsonify({ 'schools': [{ 'id': s.id, 'value': s.name.title() } for s in School.search_in_city(city_code, term)] })
 
 @app.route("/cities/<city_code>/aggregated_scores/<year>/<enem_subject>.json")
 def aggregated_scores_by_city(city_code, year, enem_subject):
@@ -163,7 +163,7 @@ def aggregated_scores_by_city(city_code, year, enem_subject):
 def search_cities_in_state(state):
     term = request.args.get('term', '')
 
-    return jsonify({ 'cities': [{ 'id': c.id, 'value': c.name.title() } for c in City.search(state, term)] })
+    return jsonify({ 'cities': [{ 'id': c.id, 'value': c.name.title() } for c in City.search_in_state(state, term)] })
 
 @app.route("/states/<state>/aggregated_scores/<year>/<enem_subject>.json")
 def aggregated_scores_by_state(state, year, enem_subject):
