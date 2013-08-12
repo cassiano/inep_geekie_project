@@ -2,17 +2,19 @@
   var DEBUG = true;
 
   // ##################################
-  // Custom KO's bindings
+  // KO's custom bindings
   // ##################################
 
   ko.bindingHandlers.fadeVisible = {
     init: function(element, valueAccessor) {
+      // Get the latest data that we're bound to.
       var display = ko.unwrap(valueAccessor()); 
 
       // Start visible/invisible according to initial value.
       $(element).toggle(display);
     },
     update: function(element, valueAccessor, allBindingsAccessor) {
+      // Get the latest data that we're bound to.
       var display = ko.unwrap(valueAccessor()), allBindings = allBindingsAccessor();
 
       // Grab some more data from another binding property.
@@ -25,6 +27,7 @@
 
   ko.bindingHandlers.autocomplete = {
     init: function(element, valueAccessor) {
+      // Get the latest data that we're bound to.
       var options = ko.unwrap(valueAccessor());
 
       $(element).autocomplete({
@@ -40,6 +43,7 @@
       });
     },
     update: function(element, valueAccessor) {
+      // Get the latest data that we're bound to.
       var options = ko.unwrap(valueAccessor());
       
       $(element).autocomplete('option', 'source', function(request, response) {
@@ -82,7 +86,7 @@
   }
 
   // ##################################
-  // View Model definition
+  // KO's View Model definition
   // ##################################
 
   var ViewModel = function() {
@@ -266,8 +270,11 @@
     }
   };
 
+  // ##################################
+  // KO initialization
+  // ##################################
+
   $(function() {
-    // Initialize Knockout.
     var viewModel = new ViewModel();
     ko.applyBindings(viewModel);
   });
