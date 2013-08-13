@@ -43,12 +43,12 @@
 
   <div id='city-container' class='ui-widget' data-bind='fadeVisible: state, duration: 1000'>
     <label for='city'>Cidade: </label>
-    <input id='city' size='40' placeholder='Digite o nome de uma cidade' data-bind="autocomplete: { url: '/states/' + state() + '/cities/search.json', jsonKey: 'cities', updateCallback: helpers.autocomplete.updateCity, autoFocus: true }" />
+    <input id='city' size='40' placeholder='Digite o nome de uma cidade' data-bind="autocomplete: { url: '/states/' + state() + '/cities/search.json', jsonKey: 'cities', updateCallback: helpers.autocomplete.updateCity }, autoFocus: true" />
   </div>
 
   <div id='school-container' class='ui-widget' data-bind='fadeVisible: autocomplete.city.id, duration: 1000'>
     <label for='school'>Escola: </label>
-    <input id='school' size='40' placeholder='Digite o nome de uma escola' data-bind="autocomplete: { url: '/cities/' + autocomplete.city.id() + '/schools/search.json', jsonKey: 'schools', updateCallback: helpers.autocomplete.updateSchool, autoFocus: true }" />
+    <input id='school' size='40' placeholder='Digite o nome de uma escola' data-bind="autocomplete: { url: '/cities/' + autocomplete.city.id() + '/schools/search.json', jsonKey: 'schools', updateCallback: helpers.autocomplete.updateSchool }, autoFocus: true" />
   </div>
 
   <br />
