@@ -76,6 +76,8 @@
     } else if (arguments.length == 3 && typeof arguments[1] == 'object' && typeof arguments[2] == 'function') {
       params   = arguments[1];
       callback = arguments[2];
+    } else {
+      throw 'Invalid arguments passed to cachedGetJSON()';
     }
     
     var cacheKey = url + ', ' + JSON.stringify(params);
