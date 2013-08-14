@@ -127,8 +127,8 @@
         };
     
         self.enemSubject = ko.observable();
-        self.year                = ko.observable();
-        self.state           = ko.observable();
+        self.year        = ko.observable();
+        self.state       = ko.observable();
         
         // ##################################
         // Autocomplete data
@@ -190,7 +190,7 @@
 
                 return [
                     { valueField: 'school', name: self.autocomplete.school.name() },
-                    { valueField: 'city',       name: 'Média da cidade de ' + self.autocomplete.city.name() }
+                    { valueField: 'city',   name: 'Média da cidade de ' + self.autocomplete.city.name() }
                 ];
             }),
 
@@ -267,8 +267,8 @@
 
             // Calculate totals.
             var totals = { school: 0.0, city: 0.0 };
-            $.each(self.chart.data.series.school(), function() { totals.school  += this; });
-            $.each(self.chart.data.series.city(),       function() { totals.city        += this; });
+            $.each(self.chart.data.series.school(), function() { totals.school += this; });
+            $.each(self.chart.data.series.city(),   function() { totals.city   += this; });
 
             // Format the data source.
             var dataSource = [];
@@ -276,7 +276,7 @@
                 dataSource[i] = {
                     scoreRange: i + '-' + (i + 1), 
                     school: totals.school > 0 ? ((self.chart.data.series.school()[i + 1] || 0) / totals.school) * 100.0 : 0.0,
-                    city:       totals.city     > 0 ? ((self.chart.data.series.city()    [i + 1] || 0) / totals.city)       * 100.0 : 0.0
+                    city:   totals.city   > 0 ? ((self.chart.data.series.city()  [i + 1] || 0) / totals.city)   * 100.0 : 0.0
                 }
             }
 
