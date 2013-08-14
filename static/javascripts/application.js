@@ -143,13 +143,13 @@
 
     self.autocomplete.options = {
       city: {
-        url: ko.computed(function() { return '/states/' + self.state() + '/cities/search.json' }),
+        url: function() { return '/states/' + self.state() + '/cities/search.json' },
         jsonKey: 'cities', 
         updateCallback: self.helpers.autocomplete.updateCity,
         autoFocus: true
       },
       school: {
-        url: ko.computed(function() { return '/cities/' + self.autocomplete.city.id() + '/schools/search.json' }), 
+        url: function() { return '/cities/' + self.autocomplete.city.id() + '/schools/search.json' }, 
         jsonKey: 'schools', 
         updateCallback: self.helpers.autocomplete.updateSchool,
         autoFocus: true
