@@ -7,18 +7,14 @@
 
   ko.bindingHandlers.fadeVisible = {
     init: function(element, valueAccessor) {
-      // Get the latest data that we're bound to.
       var display = ko.unwrap(valueAccessor()); 
 
       // Start visible/invisible according to initial value.
       $(element).toggle(display);
     },
     update: function(element, valueAccessor, allBindingsAccessor) {
-      // Get the latest data that we're bound to.
       var display = ko.unwrap(valueAccessor()), allBindings = allBindingsAccessor();
-
-      // Grab some more data from another binding property.
-      var duration = allBindings.duration || 400;   // 400 ms is default duration unless otherwise specified
+      var duration = allBindings.duration || 400;   // 400 ms is default duration unless otherwise specified.
 
       // On update, fade in/out.
       display ? $(element).fadeIn(duration) : $(element).fadeOut(duration);
@@ -27,7 +23,6 @@
 
   ko.bindingHandlers.autocomplete = {
     init: function(element, valueAccessor) {
-      // Get the latest data that we're bound to.
       var options = ko.unwrap(valueAccessor());
 
       $(element).autocomplete({
@@ -43,9 +38,8 @@
       });
     },
     update: function(element, valueAccessor) {
-      // Get the latest data that we're bound to.
       var options = ko.unwrap(valueAccessor());
-      
+
       $(element).autocomplete('option', 'source', function(request, response) {
         cachedGetJSON(
           options.url, 
@@ -60,7 +54,7 @@
   // Utility functions
   // ##################################
 
-  var log = function(msg) {
+  function log(msg) {
     if (DEBUG && console) {
       var d = new Date();
       console.log('[' + d + ' + ' + d.getMilliseconds() + ' ms] ' + msg + '...');
@@ -68,7 +62,8 @@
   }
 
   var jsonCache = {};
-  var cachedGetJSON = function() {
+
+  function cachedGetJSON() {
     var url = arguments[0], params = {}, callback;
     
     if (arguments.length == 2 && typeof arguments[1] == 'function') {
@@ -82,6 +77,7 @@
     
     if (cacheKey in jsonCache) {
       log('Getting JSON from cache');
+
       callback(jsonCache[cacheKey]);
     } else {
       log('Doing Ajax request for URL ' + url + ' with parameters ' + JSON.stringify(params))
@@ -98,7 +94,7 @@
   // KO's View Model definition
   // ##################################
 
-  var ViewModel = function() {
+  function ViewModel() {
     self = this;
   
     self.enemSubject = ko.observable();
