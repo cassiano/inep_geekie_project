@@ -22,12 +22,13 @@
   };
 
   ko.bindingHandlers.autocomplete = {
-    init: function(element, valueAccessor) {
-      var options = ko.unwrap(valueAccessor());
-
+    init: function(element, valueAccessor, allBindingsAccessor) {
+      // Get the latest data that we're bound to.
+      var options = ko.unwrap(valueAccessor()), allBindings = allBindingsAccessor();
+      
       $(element).autocomplete({
-        minLength: options.minLength || 3,
-        autoFocus: options.autoFocus != undefined ? options.autoFocus : false,
+        minLength: allBindings.minLength || 3,
+        autoFocus: allBindings.autoFocus != undefined ? allBindings.autoFocus : false,
         select: function(event, ui) {
           options.updateCallback(ui.item.id, ui.item.value);
         },
@@ -71,6 +72,8 @@
     } else if (arguments.length == 3 && typeof arguments[1] == 'object' && typeof arguments[2] == 'function') {
       params   = arguments[1];
       callback = arguments[2];
+    } else {
+      throw 'Invalid arguments passed to cachedGetJSON()';
     }
     
     var cacheKey = url + ', ' + JSON.stringify(params);
