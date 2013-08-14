@@ -22,13 +22,20 @@
   };
 
   ko.bindingHandlers.autocomplete = {
-    init: function(element, valueAccessor, allBindingsAccessor) {
+    init: function(element, valueAccessor) {
       // Get the latest data that we're bound to.
-      var options = ko.unwrap(valueAccessor()), allBindings = allBindingsAccessor();
+      var options = ko.unwrap(valueAccessor());
       
       $(element).autocomplete({
-        minLength: allBindings.minLength || 3,
-        autoFocus: allBindings.autoFocus != undefined ? allBindings.autoFocus : false,
+        minLength: options.minLength || 3,
+        autoFocus: options.autoFocus != undefined ? options.autoFocus : false,
+        source: function(request, response) {
+          cachedGetJSON(
+            options.url(), 
+            { term: request.term }, 
+            function(data) { response(data[options.jsonKey]); }
+          );
+        },
         select: function(event, ui) {
           options.updateCallback(ui.item.id, ui.item.value);
         },
@@ -37,18 +44,7 @@
           if (ui.item == null) options.updateCallback(undefined, undefined);
         }
       });
-    },
-    update: function(element, valueAccessor) {
-      var options = ko.unwrap(valueAccessor());
-
-      $(element).autocomplete('option', 'source', function(request, response) {
-        cachedGetJSON(
-          options.url, 
-          { term: request.term }, 
-          function(data) { response(data[options.jsonKey]); }
-        );
-      });
-    } 
+    }
   };
 
   // ##################################
@@ -99,6 +95,36 @@
 
   function ViewModel() {
     self = this;
+
+    // ##################################
+    // Helper functions
+    // ##################################
+
+    self.helpers = {
+      resetCity: function() {
+        $('#city').val('');
+
+        self.helpers.autocomplete.updateCity(undefined, undefined);
+      },
+
+      resetSchool: function() {
+        $('#school').val('');
+
+        self.helpers.autocomplete.updateSchool(undefined, undefined);
+      },
+
+      autocomplete: {
+        updateCity: function(id, name) {
+          self.autocomplete.city.id(id);
+          self.autocomplete.city.name(name);
+        },
+
+        updateSchool: function(id, name) {
+          self.autocomplete.school.id(id);
+          self.autocomplete.school.name(name);
+        }
+      }
+    };
   
     self.enemSubject = ko.observable();
     self.year        = ko.observable();
@@ -107,13 +133,28 @@
     self.autocomplete = {
       city: {
         id: ko.observable(),
-        name: ko.observable()
+        name: ko.observable(),
       },
       school: {
         id: ko.observable(),
-        name: ko.observable()
+        name: ko.observable(),
       }
-    }
+    };
+
+    self.autocomplete.options = {
+      city: {
+        url: ko.computed(function() { return '/states/' + self.state() + '/cities/search.json' }),
+        jsonKey: 'cities', 
+        updateCallback: self.helpers.autocomplete.updateCity,
+        autoFocus: true
+      },
+      school: {
+        url: ko.computed(function() { return '/cities/' + self.autocomplete.city.id() + '/schools/search.json' }), 
+        jsonKey: 'schools', 
+        updateCallback: self.helpers.autocomplete.updateSchool,
+        autoFocus: true
+      }
+    };
 
     self.chart = {
       data: {
@@ -133,7 +174,7 @@
           { valueField: 'city',   name: 'Média da cidade de ' + self.autocomplete.city.name() }
         ];
       })
-    }
+    };
 
     self.chart.options = {
       dataSource: ko.computed(self.chart.data.source),
@@ -156,7 +197,7 @@
         verticalAlignment: 'bottom',
         horizontalAlignment: 'center'
       }      
-    }
+    };
 
     // ##################################
     // Chart data refreshers
@@ -213,8 +254,8 @@
 
       // Calculate totals.
       var totals = { school: 0.0, city: 0.0 };
-      $.each(self.chart.data.series.school(), function() { totals.school  += this; })
-      $.each(self.chart.data.series.city(),   function() { totals.city    += this; })
+      $.each(self.chart.data.series.school(), function() { totals.school  += this; });
+      $.each(self.chart.data.series.city(),   function() { totals.city    += this; });
 
       // Format the data source.
       var dataSource = [];
@@ -244,36 +285,6 @@
       self.helpers.resetSchool();
       setTimeout(function() { $('#school').focus(); }, 200);
     });
-
-    // ##################################
-    // Helper functions
-    // ##################################
-
-    self.helpers = {
-      resetCity: function() {
-        $('#city').val('');
-
-        self.helpers.autocomplete.updateCity(undefined, undefined);
-      },
-
-      resetSchool: function() {
-        $('#school').val('');
-
-        self.helpers.autocomplete.updateSchool(undefined, undefined);
-      },
-
-      autocomplete: {
-        updateCity: function(id, name) {
-          self.autocomplete.city.id(id);
-          self.autocomplete.city.name(name);
-        },
-
-        updateSchool: function(id, name) {
-          self.autocomplete.school.id(id);
-          self.autocomplete.school.name(name);
-        }
-      }
-    }
   };
 
   // ##################################
