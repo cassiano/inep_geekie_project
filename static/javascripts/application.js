@@ -134,10 +134,10 @@
         self.state       = ko.observable();
 
         self.enemSubjects = [
-            { id: 'NAT', name: 'Ciências da Natureza' },
-            { id: 'HUM', name: 'Ciências Humanas' },
-            { id: 'LAN', name: 'Linguagens e Códigos' },
-            { id: 'MAT', name: 'Matemática' }
+            { value: 'NAT', name: 'Ciências da Natureza' },
+            { value: 'HUM', name: 'Ciências Humanas' },
+            { value: 'LAN', name: 'Linguagens e Códigos' },
+            { value: 'MAT', name: 'Matemática' }
         ];
         
         // ##################################
@@ -243,7 +243,7 @@
             }
         
             cachedGetJSON(
-                '/schools/' + self.autocomplete.school.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject().id + '.json', 
+                '/schools/' + self.autocomplete.school.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject().value + '.json', 
                 self.chart.data.series.school       // Update the observable when the Ajax call has completed.
             );
         });
@@ -262,7 +262,7 @@
             }
 
             cachedGetJSON(
-                '/cities/' + self.autocomplete.city.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject().id + '.json', 
+                '/cities/' + self.autocomplete.city.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject().value + '.json', 
                 self.chart.data.series.city     // Update the observable when the Ajax call has completed.
             );
         });
