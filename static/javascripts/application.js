@@ -23,7 +23,6 @@
 
     ko.bindingHandlers.autocomplete = {
         init: function(element, valueAccessor) {
-            // Get the latest data that we're bound to.
             var options = ko.unwrap(valueAccessor());
             
             $(element).autocomplete({
