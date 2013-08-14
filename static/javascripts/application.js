@@ -132,6 +132,17 @@
         self.enemSubject = ko.observable();
         self.year        = ko.observable();
         self.state       = ko.observable();
+
+        self.enemSubjectName = ko.computed(function() {
+            var ENEM_SUBJECTS_MAPPING = { 
+                NAT: 'Ciências da Natureza',
+                HUM: 'Ciências Humanas',
+                LAN: 'Linguagens e Códigos',
+                MAT: 'Matemática'
+            };
+            
+            return ENEM_SUBJECTS_MAPPING[self.enemSubject()];
+        });
         
         // ##################################
         // Autocomplete data
@@ -207,7 +218,9 @@
                 }
             },
 
-            title: { text: 'Histograma de comparação' },        
+            title: ko.computed(function() { 
+                return { text: 'Histograma - ' + self.enemSubjectName() + ' - ' + self.year() }
+            }),
 
             legend: {
                 verticalAlignment: 'bottom',
