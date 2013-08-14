@@ -162,9 +162,12 @@
           school: ko.observable(),
           city: ko.observable()
         },
-        
         source: ko.observable()
       },
+    };
+
+    self.chart.options = {
+      dataSource: self.chart.data.source,
 
       series: ko.computed(function() {
         log('Series being updated');
@@ -173,13 +176,7 @@
           { valueField: 'school', name: self.autocomplete.school.name() },
           { valueField: 'city',   name: 'Média da cidade de ' + self.autocomplete.city.name() }
         ];
-      })
-    };
-
-    self.chart.options = {
-      dataSource: ko.computed(self.chart.data.source),
-
-      series: ko.computed(self.chart.series),
+      }),
 
       commonSeriesSettings: {
         argumentField: 'scoreRange',
