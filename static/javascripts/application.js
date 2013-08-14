@@ -130,6 +130,10 @@
     self.year        = ko.observable();
     self.state       = ko.observable();
     
+    // ##################################
+    // Autocomplete data
+    // ##################################
+
     self.autocomplete = {
       city: {
         id: ko.observable(),
@@ -140,6 +144,10 @@
         name: ko.observable(),
       }
     };
+
+    // ##################################
+    // Autocomplete options
+    // ##################################
 
     self.autocomplete.options = {
       city: {
@@ -156,6 +164,10 @@
       }
     };
 
+    // ##################################
+    // Chat data
+    // ##################################
+
     self.chart = {
       data: {
         series: {
@@ -165,6 +177,10 @@
         source: ko.observable()
       },
     };
+
+    // ##################################
+    // Chat options
+    // ##################################
 
     self.chart.options = {
       dataSource: self.chart.data.source,
