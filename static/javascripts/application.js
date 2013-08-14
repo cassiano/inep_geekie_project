@@ -24,25 +24,29 @@
     ko.bindingHandlers.autocomplete = {
         init: function(element, valueAccessor) {
             var options = ko.unwrap(valueAccessor());
+            var defaultJqueryUIOptions = {
+                minLength: 3,
+                autoFocus: true
+            }
             
-            $(element).autocomplete({
-                minLength: options.minLength != undefined ? options.minLength : 3,
-                autoFocus: options.autoFocus != undefined ? options.autoFocus : false,
-                source: function(request, response) {
-                    cachedGetJSON(
-                        options.url(), 
-                        { term: request.term }, 
-                        function(data) { response(options.jsonRoot ? data[options.jsonRoot] : data); }
-                    );
-                },
-                select: function(event, ui) {
-                    options.updateCallback(ui.item.id, ui.item.value);
-                },
-                change: function(event, ui) {
-                    // Reset viewModel's autocomplete data on invalid changes.
-                    if (ui.item == null) options.updateCallback(undefined, undefined);
-                }
-            });
+            $(element).autocomplete(
+                $.extend(defaultJqueryUIOptions, options.jqueryUIOptions || {}, {
+                    source: function(request, response) {
+                        cachedGetJSON(
+                            options.url(), 
+                            { term: request.term }, 
+                            function(data) { response(options.jsonRoot ? data[options.jsonRoot] : data); }
+                        );
+                    },
+                    select: function(event, ui) {
+                        options.updateCallback(ui.item.id, ui.item.value);
+                    },
+                    change: function(event, ui) {
+                        // Reset viewModel's autocomplete data on invalid changes.
+                        if (ui.item == null) options.updateCallback(undefined, undefined);
+                    }
+                })
+            );
         }
     };
 
@@ -153,13 +157,13 @@
                 url: function() { return '/states/' + self.state() + '/cities/search.json' },
                 jsonRoot: 'cities', 
                 updateCallback: self.helpers.autocomplete.updateCity,
-                autoFocus: true
+                jqueryUIOptions: {}
             },
             school: {
                 url: function() { return '/cities/' + self.autocomplete.city.id() + '/schools/search.json' }, 
                 jsonRoot: 'schools', 
                 updateCallback: self.helpers.autocomplete.updateSchool,
-                autoFocus: true
+                jqueryUIOptions: {}
             }
         };
 
