@@ -26,7 +26,7 @@
             var options = ko.unwrap(valueAccessor());
             
             $(element).autocomplete({
-                minLength: options.minLength || 3,
+                minLength: options.minLength != undefined ? options.minLength : 3,
                 autoFocus: options.autoFocus != undefined ? options.autoFocus : false,
                 source: function(request, response) {
                     cachedGetJSON(
