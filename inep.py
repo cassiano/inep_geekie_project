@@ -19,10 +19,10 @@ db = SQLAlchemy(app)
 
 # Constants.
 ENEM_SUBJECTS_MAPPING = { 
-    'NAT': ['nature_sciences',      u'Ciências da Natureza'],
-    'HUM': ['human_sciences',       u'Ciências Humanas'],
-    'LAN': ['languages_and_codes',  u'Linguagens e Códigos'],
-    'MAT': ['math',                 u'Matemática']
+    'NAT': 'nature_sciences',
+    'HUM': 'human_sciences',
+    'LAN': 'languages_and_codes',
+    'MAT': 'math',
 }
 # TODO: rewrite the SQL command below using the SQLAlchemy API.
 COUNT_BY_RANGE_SQL_STATEMENT = """
@@ -93,7 +93,7 @@ class School(db.Model):
 
     @classmethod
     def aggregated_scores(cls, city_id, year, enem_subject):
-      sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0], 'id')
+      sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()], 'id')
 
       return db.session.query('range1', 'count').from_statement(sql_statement).params(id=city_id, year=year)
 
@@ -114,7 +114,7 @@ class City(db.Model):
 
     @classmethod
     def aggregated_scores(cls, city_code, year, enem_subject):
-        sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0], 'city_code')
+        sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()], 'city_code')
 
         return db.session.query('range1', 'count').from_statement(sql_statement).params(city_code=city_code, year=year)
 
@@ -129,7 +129,7 @@ class State(db.Model):
 
     @classmethod
     def aggregated_scores(cls, state, year, enem_subject):
-        sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()][0], 'state')
+        sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()], 'state')
 
         return db.session.query('range1', 'count').from_statement(sql_statement).params(state=state.upper(), year=year)
 
@@ -175,8 +175,7 @@ def aggregated_scores_by_state(state, year, enem_subject):
 
 @app.route('/')
 def root():
-    enem_subjects = sorted([[k, v[1]] for k, v in ENEM_SUBJECTS_MAPPING.iteritems()], key=itemgetter(1))
-    states        = State.query
-    years         = sorted([es.year for es in EnemSubscription.years()], reverse=True)
+    states = State.query
+    years  = sorted([es.year for es in EnemSubscription.years()], reverse=True)
     
-    return render_template('index.html', enem_subjects=enem_subjects, states=states, years=years)
+    return render_template('index.html', states=states, years=years)

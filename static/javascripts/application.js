@@ -133,16 +133,12 @@
         self.year        = ko.observable();
         self.state       = ko.observable();
 
-        self.enemSubjectName = ko.computed(function() {
-            var ENEM_SUBJECTS_MAPPING = { 
-                NAT: 'Ciências da Natureza',
-                HUM: 'Ciências Humanas',
-                LAN: 'Linguagens e Códigos',
-                MAT: 'Matemática'
-            };
-            
-            return ENEM_SUBJECTS_MAPPING[self.enemSubject()];
-        });
+        self.enemSubjects = [
+            { id: 'NAT', name: 'Ciências da Natureza' },
+            { id: 'HUM', name: 'Ciências Humanas' },
+            { id: 'LAN', name: 'Linguagens e Códigos' },
+            { id: 'MAT', name: 'Matemática' }
+        ];
         
         // ##################################
         // Autocomplete data
@@ -219,7 +215,8 @@
             },
 
             title: ko.computed(function() { 
-                return { text: 'Histograma - ' + self.enemSubjectName() + ' - ' + self.year() }
+                if (self.enemSubject()) 
+                    return { text: 'Histograma - ' + self.enemSubject().name + ' - ' + self.year() }
             }),
 
             legend: {
@@ -246,7 +243,7 @@
             }
         
             cachedGetJSON(
-                '/schools/' + self.autocomplete.school.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json', 
+                '/schools/' + self.autocomplete.school.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject().id + '.json', 
                 self.chart.data.series.school       // Update the observable when the Ajax call has completed.
             );
         });
@@ -265,7 +262,7 @@
             }
 
             cachedGetJSON(
-                '/cities/' + self.autocomplete.city.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject() + '.json', 
+                '/cities/' + self.autocomplete.city.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject().id + '.json', 
                 self.chart.data.series.city     // Update the observable when the Ajax call has completed.
             );
         });
