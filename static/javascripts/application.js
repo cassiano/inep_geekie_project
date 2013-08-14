@@ -32,7 +32,7 @@
                     cachedGetJSON(
                         options.url(), 
                         { term: request.term }, 
-                        function(data) { response(data[options.jsonKey]); }
+                        function(data) { response(options.jsonRoot ? data[options.jsonRoot] : data); }
                     );
                 },
                 select: function(event, ui) {
@@ -151,13 +151,13 @@
         self.autocomplete.options = {
             city: {
                 url: function() { return '/states/' + self.state() + '/cities/search.json' },
-                jsonKey: 'cities', 
+                jsonRoot: 'cities', 
                 updateCallback: self.helpers.autocomplete.updateCity,
                 autoFocus: true
             },
             school: {
                 url: function() { return '/cities/' + self.autocomplete.city.id() + '/schools/search.json' }, 
-                jsonKey: 'schools', 
+                jsonRoot: 'schools', 
                 updateCallback: self.helpers.autocomplete.updateSchool,
                 autoFocus: true
             }
