@@ -147,11 +147,11 @@
         self.autocomplete = {
             city: {
                 id: ko.observable(),
-                name: ko.observable(),
+                name: ko.observable()
             },
             school: {
                 id: ko.observable(),
-                name: ko.observable(),
+                name: ko.observable()
             }
         };
 
@@ -185,7 +185,7 @@
                     city: ko.observable()
                 },
                 source: ko.observable()
-            },
+            }
         };
 
         // ##################################
