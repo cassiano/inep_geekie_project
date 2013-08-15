@@ -72,7 +72,7 @@
             params   = arguments[1];
             callback = arguments[2];
         } else {
-            throw 'Invalid arguments passed to cachedGetJSON()';
+            throw new Error('Invalid arguments passed to cachedGetJSON()');
         }
         
         var cacheKey = url + ', ' + JSON.stringify(params);
