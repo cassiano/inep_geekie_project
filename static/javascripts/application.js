@@ -200,7 +200,7 @@
 
                 return [
                     { valueField: 'school', name: self.autocomplete.school.name() },
-                    { valueField: 'city',   name: 'Média da cidade de ' + self.autocomplete.city.name() }
+                    { valueField: 'city',   name: 'Média da cidade de ' + self.autocomplete.city.name() + '-' + self.state() }
                 ];
             }),
 
