@@ -64,30 +64,30 @@
     var jsonCache = {};
 
     function cachedGetJSON() {
-        var url = arguments[0], params = {}, callback;
+        var url = arguments[0], data = {}, success;
         
         if (arguments.length == 2 && typeof arguments[1] == 'function') {
-            callback = arguments[1];
+            success = arguments[1];
         } else if (arguments.length == 3 && typeof arguments[1] == 'object' && typeof arguments[2] == 'function') {
-            params   = arguments[1];
-            callback = arguments[2];
+            data    = arguments[1];
+            success = arguments[2];
         } else {
             throw new Error('Invalid arguments passed to cachedGetJSON()');
         }
         
-        var cacheKey = url + ', ' + JSON.stringify(params);
+        var cacheKey = url + ', ' + JSON.stringify(data);
         
         if (cacheKey in jsonCache) {
             log('Getting JSON from cache');
 
-            callback(jsonCache[cacheKey]);
+            success(jsonCache[cacheKey]);
         } else {
-            log('Doing Ajax request for URL ' + url + ' with parameters ' + JSON.stringify(params))
+            log('Doing Ajax request for URL ' + url + ' with parameters ' + JSON.stringify(data))
             
-            $.getJSON(url, params, function(data) {
+            $.getJSON(url, data, function(innerData, textStatus, jqXHR) {
                 log('Saving JSON in cache');
-                jsonCache[cacheKey] = data;
-                callback(data);
+                jsonCache[cacheKey] = innerData;
+                success(innerData, textStatus, jqXHR);
             });
         }
     }
