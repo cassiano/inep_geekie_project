@@ -53,7 +53,7 @@
     // -----------------
 
     function log(msg) {
-        if (DEBUG && console) {
+        if (DEBUG && console && console.log) {
             var d = new Date();
             console.log('[' + d + ' + ' + d.getMilliseconds() + ' ms] ' + msg + '...');
         }
