@@ -1,9 +1,8 @@
 (function() {
     var DEBUG = true;
 
-    // ##################################
     // KO's custom bindings
-    // ##################################
+    // --------------------
 
     ko.bindingHandlers.fadeVisible = {
         init: function(element, valueAccessor) {
@@ -50,9 +49,8 @@
         }
     };
 
-    // ##################################
     // Utility functions
-    // ##################################
+    // -----------------
 
     function log(msg) {
         if (DEBUG && console) {
@@ -92,17 +90,15 @@
         }
     }
 
-    // ##################################
-    // KO's View Model definition
-    // ##################################
-
+    // KO View Model definition
+    // ------------------------
+    //
     function ViewModel() {
         self = this;
 
-        // ##################################
         // Helper functions
-        // ##################################
-
+        // ----------------
+        //
         self.helpers = {
             resetCity: function() {
                 $('#city').val('');
@@ -118,17 +114,20 @@
 
             autocomplete: {
                 updateCity: function(id, name) {
-                    self.autocomplete.city.id(id);
-                    self.autocomplete.city.name(name);
+                    self.autocomplete.data.city.id(id);
+                    self.autocomplete.data.city.name(name);
                 },
 
                 updateSchool: function(id, name) {
-                    self.autocomplete.school.id(id);
-                    self.autocomplete.school.name(name);
+                    self.autocomplete.data.school.id(id);
+                    self.autocomplete.data.school.name(name);
                 }
             }
         };
-    
+
+        // Observables mapped directly to form fields
+        // ------------------------------------------
+        //
         self.enemSubject = ko.observable();
         self.year        = ko.observable();
         self.state       = ko.observable();
@@ -140,45 +139,45 @@
             { value: 'MAT', name: 'Matemática' }
         ];
         
-        // ##################################
-        // Autocomplete data
-        // ##################################
-
+        // Autocomplete data and options
+        // -----------------------------
+        //
         self.autocomplete = {
-            city: {
-                id: ko.observable(),
-                name: ko.observable()
+            // Observables managed by autocomplete, using helper functions
+            // -----------------------------------------------------------
+            data: {
+                city: {
+                    id: ko.observable(),
+                    name: ko.observable()
+                },
+                school: {
+                    id: ko.observable(),
+                    name: ko.observable()
+                },
             },
-            school: {
-                id: ko.observable(),
-                name: ko.observable()
+            options: {
+                city: {
+                    url: function() { return '/states/' + self.state() + '/cities/search.json' },
+                    jsonRoot: 'cities', 
+                    updateCallback: self.helpers.autocomplete.updateCity,
+                    jqueryUIOptions: {}
+                },
+                school: {
+                    url: function() { return '/cities/' + self.autocomplete.data.city.id() + '/schools/search.json' }, 
+                    jsonRoot: 'schools', 
+                    updateCallback: self.helpers.autocomplete.updateSchool,
+                    jqueryUIOptions: {}
+                }
             }
         };
 
-        // ##################################
-        // Autocomplete options
-        // ##################################
-
-        self.autocomplete.options = {
-            city: {
-                url: function() { return '/states/' + self.state() + '/cities/search.json' },
-                jsonRoot: 'cities', 
-                updateCallback: self.helpers.autocomplete.updateCity,
-                jqueryUIOptions: {}
-            },
-            school: {
-                url: function() { return '/cities/' + self.autocomplete.city.id() + '/schools/search.json' }, 
-                jsonRoot: 'schools', 
-                updateCallback: self.helpers.autocomplete.updateSchool,
-                jqueryUIOptions: {}
-            }
-        };
-
-        // ##################################
-        // Chat data
-        // ##################################
+        // Chart data
+        // ----------
 
         self.chart = {
+            // Observables managed by updater computed functions (see below)
+            // -------------------------------------------------------------
+            //
             data: {
                 series: {
                     school: ko.observable(),
@@ -188,10 +187,9 @@
             }
         };
 
-        // ##################################
-        // Chat options
-        // ##################################
-
+        // Chart options
+        // -------------
+        //
         self.chart.options = {
             dataSource: self.chart.data.source,
 
@@ -199,8 +197,8 @@
                 log('Series being updated');
 
                 return [
-                    { valueField: 'school', name: self.autocomplete.school.name() },
-                    { valueField: 'city',   name: 'Média da cidade de ' + self.autocomplete.city.name() + '-' + self.state() }
+                    { valueField: 'school', name: self.autocomplete.data.school.name() },
+                    { valueField: 'city',   name: 'Média da cidade de ' + self.autocomplete.data.city.name() + '-' + self.state() }
                 ];
             }),
 
@@ -225,11 +223,9 @@
             }            
         };
 
-        // ##################################
-        // Chart data refreshers
-        // ##################################
-
-        // chart.data.series.school updater.
+        // chart.data.series.school updater
+        // --------------------------------
+        //
         ko.computed(function() {
             log('School data series being refreshed');
         
@@ -237,18 +233,20 @@
             self.chart.data.series.school(undefined);
 
             // Return if no school selected.
-            if (!self.autocomplete.school.id()) { 
+            if (!self.autocomplete.data.school.id()) { 
                 log('No school selected. Returning'); 
                 return; 
             }
         
             cachedGetJSON(
-                '/schools/' + self.autocomplete.school.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject().value + '.json', 
+                '/schools/' + self.autocomplete.data.school.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject().value + '.json', 
                 self.chart.data.series.school       // Update the observable when the Ajax call has completed.
             );
         });
 
-        // chart.data.series.city updater.
+        // chart.data.series.city updater
+        // ------------------------------
+        //
         ko.computed(function() {
             log('City data series being refreshed');
 
@@ -256,18 +254,20 @@
             self.chart.data.series.city(undefined);
 
             // Return if no city selected.
-            if (!self.autocomplete.city.id()) { 
+            if (!self.autocomplete.data.city.id()) { 
                 log('No city selected. Returning'); 
                 return; 
             }
 
             cachedGetJSON(
-                '/cities/' + self.autocomplete.city.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject().value + '.json', 
+                '/cities/' + self.autocomplete.data.city.id() + '/aggregated_scores/' + self.year() + '/' + self.enemSubject().value + '.json', 
                 self.chart.data.series.city     // Update the observable when the Ajax call has completed.
             );
         });
 
-        // chart.data.source updater.
+        // chart.data.source updater
+        // -------------------------
+        //
         ko.computed(function() {
             log('Data source being updated');
         
@@ -296,9 +296,8 @@
             self.chart.data.source(dataSource);
         });
 
-        // ##################################
         // Manual subscriptions
-        // ##################################
+        // --------------------
 
         // Whenever state is changed, reset and move focus to city.
         self.state.subscribe(function(value) { 
@@ -307,16 +306,15 @@
         });
 
         // Whenever city is changed, reset and move focus to school.
-        self.autocomplete.city.id.subscribe(function(value) { 
+        self.autocomplete.data.city.id.subscribe(function(value) { 
             self.helpers.resetSchool();
             setTimeout(function() { $('#school').focus(); }, 200);
         });
     };
 
-    // ##################################
     // KO initialization
-    // ##################################
-
+    // -----------------
+    //
     $(function() {
         var viewModel = new ViewModel();
         ko.applyBindings(viewModel);
