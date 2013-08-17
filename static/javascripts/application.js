@@ -1,9 +1,7 @@
 (function() {
     var DEBUG = true;
 
-    // KO's custom bindings
-    // --------------------
-
+    // A replacement for the 'visible' KO binding, using jQuery's fadeIn() and fadeOut().
     ko.bindingHandlers.fadeVisible = {
         init: function(element, valueAccessor) {
             var display = ko.unwrap(valueAccessor()); 
@@ -20,9 +18,12 @@
         } 
     };
 
+    // A KO custom binding to add autocomplete behavior to textboxes.
     ko.bindingHandlers.autocomplete = {
         init: function(element, valueAccessor) {
             var options = ko.unwrap(valueAccessor());
+            
+            // Default jQuery options. Each option might be individually overridden (by passing a 'jqueryUIOptions' options key).
             var defaultJqueryUIOptions = {
                 minLength: 3,
                 autoFocus: true
@@ -31,6 +32,7 @@
             $(element).autocomplete(
                 $.extend(defaultJqueryUIOptions, options.jqueryUIOptions || {}, {
                     source: function(request, response) {
+                        // Use our internal cached version of jQuery's getJSON(), improving our UI responsiveness.
                         cachedGetJSON(
                             options.url(), 
                             { term: request.term }, 
@@ -38,10 +40,12 @@
                         );
                     },
                     select: function(event, ui) {
+                        // Save the selected item's (city or school) ID and name in the view model.
                         options.updateCallback(ui.item.id, ui.item.value);
                     },
                     change: function(event, ui) {
-                        // Reset viewModel's autocomplete data on invalid changes.
+                        // On invalid changes (e.g. clearing the textbox or typing an invalid sequence, and hitting TAB), 
+                        // reset the viewModel's ID and value.
                         if (ui.item == null) options.updateCallback(undefined, undefined);
                     }
                 })
@@ -49,9 +53,7 @@
         }
     };
 
-    // Utility functions
-    // -----------------
-
+    // A plain old log with a timestamp (with milliseconds).
     function log(msg) {
         if (DEBUG && console) {
             var d = new Date();
@@ -59,8 +61,8 @@
         }
     }
 
+    // A simple replacement for jQuery's getJSON(), with cache support. 
     var jsonCache = {};
-
     function cachedGetJSON() {
         var url = arguments[0], data = {}, success;
         
@@ -90,22 +92,20 @@
         }
     }
 
-    // KO View Model definition
-    // ------------------------
-    //
+    // Our KO view model.
     function ViewModel() {
         self = this;
 
-        // Helper functions
-        // ----------------
-        //
+        // Helper functions.
         self.helpers = {
+            // Resets city's autocomplete textbox and the view model's corresponding ID and name.
             resetCity: function() {
                 $('#city').val('');
 
                 self.helpers.autocomplete.updateCity(undefined, undefined);
             },
 
+            // Resets school's autocomplete textbox and the view model's corresponding ID and name.
             resetSchool: function() {
                 $('#school').val('');
 
@@ -113,11 +113,13 @@
             },
 
             autocomplete: {
+                // Updates view model's city ID and name.
                 updateCity: function(id, name) {
                     self.autocomplete.data.city.id(id);
                     self.autocomplete.data.city.name(name);
                 },
 
+                // Updates view model's school ID and name.
                 updateSchool: function(id, name) {
                     self.autocomplete.data.school.id(id);
                     self.autocomplete.data.school.name(name);
@@ -125,13 +127,12 @@
             }
         };
 
-        // Observables mapped directly to form fields
-        // ------------------------------------------
-        //
+        // Store the currently selected Enem subject, year and state.
         self.enemSubject = ko.observable();
         self.year        = ko.observable();
         self.state       = ko.observable();
 
+        // List of available Enem subjects (used to populated the Enem subject's pulldown).
         self.enemSubjects = [
             { value: 'NAT', name: 'Ciências da Natureza' },
             { value: 'HUM', name: 'Ciências Humanas' },
@@ -139,12 +140,8 @@
             { value: 'MAT', name: 'Matemática' }
         ];
         
-        // Autocomplete data and options
-        // -----------------------------
-        //
         self.autocomplete = {
-            // Observables managed by autocomplete, using helper functions
-            // -----------------------------------------------------------
+            // Store the autocomplete data, with observables managed by autocomplete, using helper functions.
             data: {
                 city: {
                     id: ko.observable(),
@@ -155,6 +152,7 @@
                     name: ko.observable()
                 },
             },
+            // Autocomplete options.
             options: {
                 city: {
                     url: function() { return '/states/' + self.state() + '/cities/search.json' },
@@ -171,13 +169,8 @@
             }
         };
 
-        // Chart data
-        // ----------
-
+        // Store the chart data, with observables managed automatically by updater computed functions (see below).
         self.chart = {
-            // Observables managed by updater computed functions (see below)
-            // -------------------------------------------------------------
-            //
             data: {
                 series: {
                     school: ko.observable(),
@@ -187,9 +180,7 @@
             }
         };
 
-        // Chart options
-        // -------------
-        //
+        // Chart options.
         self.chart.options = {
             dataSource: self.chart.data.source,
 
@@ -223,9 +214,7 @@
             }            
         };
 
-        // chart.data.series.school updater
-        // --------------------------------
-        //
+        // Computed observable responsible for updating the 'chart.data.series.school' observable.
         ko.computed(function() {
             log('School data series being refreshed');
         
@@ -244,9 +233,7 @@
             );
         });
 
-        // chart.data.series.city updater
-        // ------------------------------
-        //
+        // Computed observable responsible for updating the 'chart.data.series.city' observable.
         ko.computed(function() {
             log('City data series being refreshed');
 
@@ -265,9 +252,7 @@
             );
         });
 
-        // chart.data.source updater
-        // -------------------------
-        //
+        // Computed observable responsible for updating the 'chart.data.source' observable.
         ko.computed(function() {
             log('Data source being updated');
         
@@ -293,11 +278,9 @@
                 }
             }
 
+            // Update the observable.
             self.chart.data.source(dataSource);
         });
-
-        // Manual subscriptions
-        // --------------------
 
         // Whenever state is changed, reset and move focus to city.
         self.state.subscribe(function(value) { 
@@ -312,11 +295,8 @@
         });
     };
 
-    // KO initialization
-    // -----------------
-    //
     $(function() {
-        var viewModel = new ViewModel();
-        ko.applyBindings(viewModel);
+        // KO initialization.
+        ko.applyBindings(new ViewModel());
     });
 })();
