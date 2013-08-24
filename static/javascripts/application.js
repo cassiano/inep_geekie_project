@@ -1,31 +1,33 @@
-(function() {
+(function () {
     'use strict';
     
-    var DEBUG = true;
+    var DEBUG      = true;
+    var JSON_CACHE = {};
 
     // A replacement for the 'visible' KO binding, using jQuery's fadeIn() and fadeOut().
     ko.bindingHandlers.fadeVisible = {
-        init: function(element, valueAccessor) {
+        init: function (element, valueAccessor) {
             var display = ko.unwrap(valueAccessor()); 
 
             // Start visible/invisible according to initial value.
             $(element).toggle(display);
         },
-        update: function(element, valueAccessor, allBindingsAccessor) {
+        update: function (element, valueAccessor, allBindingsAccessor) {
             var display = ko.unwrap(valueAccessor()), allBindings = allBindingsAccessor();
             var duration = allBindings.duration || 400;     // 400 ms is default duration unless otherwise specified.
 
             // On update, fade in/out.
-            if (display)
+            if (display) {
                 $(element).fadeIn(duration);
-            else
+            } else {
                 $(element).fadeOut(duration);
+            }
         } 
     };
 
     // A KO custom binding to add autocomplete behavior to textboxes.
     ko.bindingHandlers.autocomplete = {
-        init: function(element, valueAccessor) {
+        init: function (element, valueAccessor) {
             var options = ko.unwrap(valueAccessor());
             
             // Default jQuery options. Each option might be individually overridden (by passing a 'jqueryUIOptions' options key).
@@ -36,29 +38,33 @@
             
             $(element).autocomplete(
                 $.extend(defaultJqueryUIOptions, options.jqueryUIOptions || {}, {
-                    source: function(request, response) {
+                    source: function (request, response) {
                         // Use our internal cached version of jQuery's getJSON(), improving our UI responsiveness.
                         cachedGetJSON(
                             options.url(), 
                             { term: request.term }, 
-                            function(data) { response(options.jsonRoot ? data[options.jsonRoot] : data); }
+                            function (data) { response(options.jsonRoot ? data[options.jsonRoot] : data); }
                         );
                     },
-                    select: function(event, ui) {
+                    select: function (event, ui) {
                         // Save the selected item's (city or school) ID and name in the view model.
                         options.updateCallback(ui.item.id, ui.item.value);
                     },
-                    change: function(event, ui) {
+                    change: function (event, ui) {
                         // On invalid changes (e.g. clearing the textbox or typing an invalid sequence, and hitting TAB), 
                         // reset the viewModel's ID and value.
-                        if (ui.item === null) options.updateCallback(undefined, undefined);
+                        if (ui.item === null) { options.updateCallback(undefined, undefined); }
                     }
                 })
             );
         }
     };
 
-    // A plain old log with a timestamp (with milliseconds).
+	/**
+	 * A plain old logger, with a timestamp (including milliseconds).
+	 *
+	 * @param {string} msg The message to be logged.
+	 */
     function log(msg) {
         if (DEBUG && console && console.log) {
             var d = new Date();
@@ -66,8 +72,13 @@
         }
     }
 
-    // A simple replacement for jQuery's getJSON(), with cache support. 
-    var jsonCache = {};
+	/**
+	 * A simple replacement for jQuery's getJSON(), with cache support.
+	 *
+	 * @param {string} url Source URL
+	 * @param {object} data Optional object containing GET parameters to be appended to the URL
+	 * @param {function} success Callback to be called on a successful return from server
+	 */
     function cachedGetJSON() {
         var url = arguments[0], data = {}, success;
         
@@ -82,36 +93,40 @@
         
         var cacheKey = url + ', ' + JSON.stringify(data);
         
-        if (cacheKey in jsonCache) {
+        if (cacheKey in JSON_CACHE) {
             log('Getting JSON from cache');
 
-            success(jsonCache[cacheKey]);
+            success(JSON_CACHE[cacheKey]);
         } else {
             log('Doing Ajax request for URL ' + url + ' with parameters ' + JSON.stringify(data));
             
-            $.getJSON(url, data, function(innerData, textStatus, jqXHR) {
+            $.getJSON(url, data, function (innerData, textStatus, jqXHR) {
                 log('Saving JSON in cache');
-                jsonCache[cacheKey] = innerData;
+                JSON_CACHE[cacheKey] = innerData;
                 success(innerData, textStatus, jqXHR);
             });
         }
     }
 
-    // Our KO view model.
+	/**
+	 * Our view model.
+	 *
+	 * @constructor
+	 */
     function ViewModel() {
         self = this;
 
         // Helper functions.
         self.helpers = {
             // Resets city's autocomplete textbox and the view model's corresponding ID and name.
-            resetCity: function() {
+            resetCity: function () {
                 $('#city').val('');
 
                 self.helpers.autocomplete.updateCity(undefined, undefined);
             },
 
             // Resets school's autocomplete textbox and the view model's corresponding ID and name.
-            resetSchool: function() {
+            resetSchool: function () {
                 $('#school').val('');
 
                 self.helpers.autocomplete.updateSchool(undefined, undefined);
@@ -119,13 +134,13 @@
 
             autocomplete: {
                 // Updates view model's city ID and name.
-                updateCity: function(id, name) {
+                updateCity: function (id, name) {
                     self.autocomplete.data.city.id(id);
                     self.autocomplete.data.city.name(name);
                 },
 
                 // Updates view model's school ID and name.
-                updateSchool: function(id, name) {
+                updateSchool: function (id, name) {
                     self.autocomplete.data.school.id(id);
                     self.autocomplete.data.school.name(name);
                 }
@@ -160,13 +175,13 @@
             // Autocomplete options.
             options: {
                 city: {
-                    url: function() { return '/states/' + self.state() + '/cities/search.json'; },
+                    url: function () { return '/states/' + self.state() + '/cities/search.json'; },
                     jsonRoot: 'cities', 
                     updateCallback: self.helpers.autocomplete.updateCity,
                     jqueryUIOptions: {}
                 },
                 school: {
-                    url: function() { return '/cities/' + self.autocomplete.data.city.id() + '/schools/search.json'; }, 
+                    url: function () { return '/cities/' + self.autocomplete.data.city.id() + '/schools/search.json'; }, 
                     jsonRoot: 'schools', 
                     updateCallback: self.helpers.autocomplete.updateSchool,
                     jqueryUIOptions: {}
@@ -189,7 +204,7 @@
         self.chart.options = {
             dataSource: self.chart.data.source,
 
-            series: ko.computed(function() {
+            series: ko.computed(function () {
                 log('Series being updated');
 
                 return [
@@ -208,9 +223,10 @@
                 }
             },
 
-            title: ko.computed(function() { 
-                if (self.enemSubject()) 
+            title: ko.computed(function () { 
+                if (self.enemSubject()) {
                     return { text: 'Histograma - ' + self.enemSubject().name + ' - ' + self.year() };
+                }
             }),
 
             legend: {
@@ -220,7 +236,7 @@
         };
 
         // Computed observable responsible for updating the 'chart.data.series.school' observable.
-        ko.computed(function() {
+        ko.computed(function () {
             log('School data series being refreshed');
         
             // Reset school series data.
@@ -239,7 +255,7 @@
         });
 
         // Computed observable responsible for updating the 'chart.data.series.city' observable.
-        ko.computed(function() {
+        ko.computed(function () {
             log('City data series being refreshed');
 
             // Reset city series data.
@@ -258,7 +274,7 @@
         });
 
         // Computed observable responsible for updating the 'chart.data.source' observable.
-        ko.computed(function() {
+        ko.computed(function () {
             log('Data source being updated');
         
             // Return if either school or city series data is unavailable.
@@ -270,8 +286,8 @@
 
             // Calculate totals.
             var totals = { school: 0.0, city: 0.0 };
-            $.each(self.chart.data.series.school(), function() { totals.school += this; });
-            $.each(self.chart.data.series.city(),   function() { totals.city   += this; });
+            $.each(self.chart.data.series.school(), function () { totals.school += this; });
+            $.each(self.chart.data.series.city(),   function () { totals.city   += this; });
 
             // Format the data source.
             var dataSource = [];
@@ -288,19 +304,19 @@
         });
 
         // Whenever state is changed, reset and move focus to city.
-        self.state.subscribe(function(value) { 
+        self.state.subscribe(function (value) { 
             self.helpers.resetCity();
-            setTimeout(function() { $('#city').focus(); }, 200);
+            setTimeout(function () { $('#city').focus(); }, 200);
         });
 
         // Whenever city is changed, reset and move focus to school.
-        self.autocomplete.data.city.id.subscribe(function(value) { 
+        self.autocomplete.data.city.id.subscribe(function (value) { 
             self.helpers.resetSchool();
-            setTimeout(function() { $('#school').focus(); }, 200);
+            setTimeout(function () { $('#school').focus(); }, 200);
         });
     }
 
-    $(function() {
+    $(function () {
         // KO initialization.
         ko.applyBindings(new ViewModel());
     });
