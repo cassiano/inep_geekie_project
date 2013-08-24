@@ -1,4 +1,6 @@
 (function() {
+    'use strict';
+    
     var DEBUG = true;
 
     // A replacement for the 'visible' KO binding, using jQuery's fadeIn() and fadeOut().
@@ -14,7 +16,10 @@
             var duration = allBindings.duration || 400;     // 400 ms is default duration unless otherwise specified.
 
             // On update, fade in/out.
-            display ? $(element).fadeIn(duration) : $(element).fadeOut(duration);
+            if (display)
+                $(element).fadeIn(duration);
+            else
+                $(element).fadeOut(duration);
         } 
     };
 
@@ -27,7 +32,7 @@
             var defaultJqueryUIOptions = {
                 minLength: 3,
                 autoFocus: true
-            }
+            };
             
             $(element).autocomplete(
                 $.extend(defaultJqueryUIOptions, options.jqueryUIOptions || {}, {
@@ -46,7 +51,7 @@
                     change: function(event, ui) {
                         // On invalid changes (e.g. clearing the textbox or typing an invalid sequence, and hitting TAB), 
                         // reset the viewModel's ID and value.
-                        if (ui.item == null) options.updateCallback(undefined, undefined);
+                        if (ui.item === null) options.updateCallback(undefined, undefined);
                     }
                 })
             );
@@ -82,7 +87,7 @@
 
             success(jsonCache[cacheKey]);
         } else {
-            log('Doing Ajax request for URL ' + url + ' with parameters ' + JSON.stringify(data))
+            log('Doing Ajax request for URL ' + url + ' with parameters ' + JSON.stringify(data));
             
             $.getJSON(url, data, function(innerData, textStatus, jqXHR) {
                 log('Saving JSON in cache');
@@ -150,18 +155,18 @@
                 school: {
                     id: ko.observable(),
                     name: ko.observable()
-                },
+                }
             },
             // Autocomplete options.
             options: {
                 city: {
-                    url: function() { return '/states/' + self.state() + '/cities/search.json' },
+                    url: function() { return '/states/' + self.state() + '/cities/search.json'; },
                     jsonRoot: 'cities', 
                     updateCallback: self.helpers.autocomplete.updateCity,
                     jqueryUIOptions: {}
                 },
                 school: {
-                    url: function() { return '/cities/' + self.autocomplete.data.city.id() + '/schools/search.json' }, 
+                    url: function() { return '/cities/' + self.autocomplete.data.city.id() + '/schools/search.json'; }, 
                     jsonRoot: 'schools', 
                     updateCallback: self.helpers.autocomplete.updateSchool,
                     jqueryUIOptions: {}
@@ -205,7 +210,7 @@
 
             title: ko.computed(function() { 
                 if (self.enemSubject()) 
-                    return { text: 'Histograma - ' + self.enemSubject().name + ' - ' + self.year() }
+                    return { text: 'Histograma - ' + self.enemSubject().name + ' - ' + self.year() };
             }),
 
             legend: {
@@ -275,7 +280,7 @@
                     scoreRange: i + '-' + (i + 1), 
                     school: totals.school > 0 ? ((self.chart.data.series.school()[i + 1] || 0) / totals.school) * 100.0 : 0.0,
                     city:   totals.city   > 0 ? ((self.chart.data.series.city()  [i + 1] || 0) / totals.city)   * 100.0 : 0.0
-                }
+                };
             }
 
             // Update the observable.
@@ -293,7 +298,7 @@
             self.helpers.resetSchool();
             setTimeout(function() { $('#school').focus(); }, 200);
         });
-    };
+    }
 
     $(function() {
         // KO initialization.
