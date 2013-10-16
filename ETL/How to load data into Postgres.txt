@@ -1,4 +1,4 @@
-1) Start by filtering unnecessary records from the full text file (which contains more than 5.3 million records). For example, to filter only records belonging to the city of São Paulo and then count the resulting lines:
+1) Start by filtering unnecessary records from the full text file (which contains more than 5.38 million records). For example, to filter only records belonging to the city of São Paulo and then count the resulting lines:
 
 	awk 'substr($0,212,7)=="3550308" {print}' DADOS_ENEM_2011.TXT >enem_cidade_sao_paulo.txt 
 	wc -l enem_cidade_sao_paulo.txt 
@@ -21,9 +21,9 @@ To filter (and count) records belonging to the state of São Paulo:
 3) Using any appropriate tool (e.g. pgAdmin3), create an empty Postgres database named 'inep_temp'.
 
 
-4) Create the initial tables, by loading and running the following SQL script in Postgres:
+4) Create the "raw data" tables, by loading and running the following SQL script in Postgres:
 
-	ETL/1_create_tables.sql
+	ETL/1_create_raw_data_tables.sql
 
 
 5) From the application's root folder, load both school and Enem data into Postgres, using pgloader:
@@ -31,15 +31,20 @@ To filter (and count) records belonging to the state of São Paulo:
 	~/pgloader/pgloader.PY -vsc ETL/schools_pgloader.conf
 	~/pgloader/pgloader.PY -m 4 -vsc ETL/enem_pgloader.conf
 
-PS: Enem data takes a while to execute (> 30 minutes).
+PS: Enem data takes a while to execute (> 35 minutes).
 
 
-6) Create and load all remaining tables/views, following the steps from 2 to 8:
+6) Create and load all remaining tables/views, following the steps from 2 to 8, in this order:
 
-	ETL/2_create_schools_dimension.sql
-	ETL/3_create_nc_score_dimension.sql
-	ETL/4_create_hc_score_dimension.sql
-	ETL/5_create_lc_score_dimension.sql
-	ETL/6_create_mt_score_dimension.sql
-	ETL/7_create_facts_table.sql
-	ETL/8_create_views.sql
+	Script																Approx. execution time
+	-----------------------------------		----------------------
+	ETL/2_create_schools_dimension.sql		92 s
+	ETL/3_create_nc_score_dimension.sql		7.8 s
+	ETL/4_create_hc_score_dimension.sql		7.6 s
+	ETL/5_create_lc_score_dimension.sql		7.6 s
+	ETL/6_create_mt_score_dimension.sql		7.6 s
+	ETL/7_create_facts_table.sql					4 m 14s
+	ETL/8_create_views.sql								13 ms
+
+
+7) Execute a VACUUM in the database.
