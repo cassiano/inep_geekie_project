@@ -10,7 +10,7 @@ from operator import itemgetter
 
 # Configuration.
 SECRET_KEY              = 'development key'
-SQLALCHEMY_DATABASE_URI = environ.get('HEROKU_POSTGRESQL_OLIVE_URL', 'postgres://cassiano:@localhost:5432/inep')
+SQLALCHEMY_DATABASE_URI = environ.get('HEROKU_POSTGRESQL_OLIVE_URL', 'postgres://cassiano:@localhost:5432/inep_full')
 
 # Application initialization.
 app = Flask(__name__)
@@ -92,8 +92,8 @@ class School(db.Model):
         return cls.query.filter_by(city_code=city_code).filter(cls.name.contains(term.upper())).order_by(School.name)
 
     @classmethod
-    def aggregated_scores(cls, city_id, year, enem_subject):
-      sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()], 'id')
+    def aggregated_scores(cls, city_id, year, enem_knowledge_area):
+      sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_knowledge_area.upper()], 'id')
 
       return db.session.query('range1', 'count').from_statement(sql_statement).params(id=city_id, year=year)
 
@@ -113,8 +113,8 @@ class City(db.Model):
         return cls.query.filter_by(state=state.upper()).filter(cls.name.contains(term.upper())).order_by(City.name)
 
     @classmethod
-    def aggregated_scores(cls, city_code, year, enem_subject):
-        sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()], 'city_code')
+    def aggregated_scores(cls, city_code, year, enem_knowledge_area):
+        sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_knowledge_area.upper()], 'city_code')
 
         return db.session.query('range1', 'count').from_statement(sql_statement).params(city_code=city_code, year=year)
 
@@ -128,8 +128,8 @@ class State(db.Model):
         return "<State('%s')>" % self.state
 
     @classmethod
-    def aggregated_scores(cls, state, year, enem_subject):
-        sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_subject.upper()], 'state')
+    def aggregated_scores(cls, state, year, enem_knowledge_area):
+        sql_statement = COUNT_BY_RANGE_SQL_STATEMENT.format(ENEM_SUBJECTS_MAPPING[enem_knowledge_area.upper()], 'state')
 
         return db.session.query('range1', 'count').from_statement(sql_statement).params(state=state.upper(), year=year)
 
@@ -137,9 +137,9 @@ class State(db.Model):
 # Schools routes
 ##############################
 
-@app.route("/schools/<id>/aggregated_scores/<year>/<enem_subject>.json")
-def aggregated_scores_by_school(id, year, enem_subject):
-    return jsonify([[a.range1, a.count] for a in School.aggregated_scores(id, year, enem_subject)])
+@app.route("/schools/<id>/aggregated_scores/<year>/<enem_knowledge_area>.json")
+def aggregated_scores_by_school(id, year, enem_knowledge_area):
+    return jsonify([[a.range1, a.count] for a in School.aggregated_scores(id, year, enem_knowledge_area)])
 
 ##############################
 # Cities routes
@@ -151,9 +151,9 @@ def search_schools_in_city(city_code):
         
     return jsonify({ 'schools': [{ 'id': s.id, 'value': s.name.title() } for s in School.search_in_city(city_code, term)] })
 
-@app.route("/cities/<city_code>/aggregated_scores/<year>/<enem_subject>.json")
-def aggregated_scores_by_city(city_code, year, enem_subject):
-    return jsonify([[a.range1, a.count] for a in City.aggregated_scores(city_code, year, enem_subject)])
+@app.route("/cities/<city_code>/aggregated_scores/<year>/<enem_knowledge_area>.json")
+def aggregated_scores_by_city(city_code, year, enem_knowledge_area):
+    return jsonify([[a.range1, a.count] for a in City.aggregated_scores(city_code, year, enem_knowledge_area)])
 
 ##############################
 # States routes
@@ -165,9 +165,9 @@ def search_cities_in_state(state):
 
     return jsonify({ 'cities': [{ 'id': c.id, 'value': c.name.title() } for c in City.search_in_state(state, term)] })
 
-@app.route("/states/<state>/aggregated_scores/<year>/<enem_subject>.json")
-def aggregated_scores_by_state(state, year, enem_subject):
-    return jsonify([[a.range1, a.count] for a in State.aggregated_scores(state, year, enem_subject)])
+@app.route("/states/<state>/aggregated_scores/<year>/<enem_knowledge_area>.json")
+def aggregated_scores_by_state(state, year, enem_knowledge_area):
+    return jsonify([[a.range1, a.count] for a in State.aggregated_scores(state, year, enem_knowledge_area)])
 
 ##############################
 # Root route
